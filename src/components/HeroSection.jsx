@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -17,9 +18,23 @@ import AboutCard from "./AboutCard";
 import SkillsCard from "./SkillsCard";
 import ProjectsCard from "./ProjectsCard";
 import ContactCard from "./ContactCard";
+import CardFlipTransition from "./CardFlipTransition";
+
+const panelComponents = {
+  about: AboutCard,
+  skills: SkillsCard,
+  projects: ProjectsCard,
+  contact: ContactCard,
+};
+
+function renderPanel(panel) {
+  const Panel = panelComponents[panel];
+  return Panel ? <Panel /> : null;
+}
 
 function HeroSection({ activePanel, setActivePanel }) {
   const hasActivePanel = activePanel !== "home";
+  const [hasPanelInLayout, setHasPanelInLayout] = useState(hasActivePanel);
 
   function handleMainButtonClick() {
     if (!hasActivePanel) {
@@ -49,7 +64,7 @@ function HeroSection({ activePanel, setActivePanel }) {
             display: "grid",
             gridTemplateColumns: {
               xs: "1fr",
-              md: hasActivePanel ? "1fr 1.2fr" : "1fr",
+              md: hasPanelInLayout ? "1fr 1.2fr" : "1fr",
             },
             gap: { xs: 4, md: 8 },
             alignItems: "center",
@@ -58,9 +73,11 @@ function HeroSection({ activePanel, setActivePanel }) {
         >
           <Box
             sx={{
-              maxWidth: hasActivePanel ? 680 : 760,
-              mx: hasActivePanel ? 0 : "auto",
-              transform: hasActivePanel ? "translateX(-10px)" : "translateX(0)",
+              maxWidth: hasPanelInLayout ? 680 : 760,
+              mx: hasPanelInLayout ? 0 : "auto",
+              transform: hasPanelInLayout
+                ? "translateX(-10px)"
+                : "translateX(0)",
               transition: "all 500ms ease",
             }}
           >
@@ -84,7 +101,7 @@ function HeroSection({ activePanel, setActivePanel }) {
                 lineHeight: 1.1,
                 fontSize: {
                   xs: "2.6rem",
-                  md: hasActivePanel ? "3.2rem" : "4rem",
+                  md: hasPanelInLayout ? "3.2rem" : "4rem",
                 },
               }}
             >
@@ -204,10 +221,11 @@ function HeroSection({ activePanel, setActivePanel }) {
             </Stack>
           </Box>
 
-          {activePanel === "about" && <AboutCard />}
-          {activePanel === "skills" && <SkillsCard />}
-          {activePanel === "projects" && <ProjectsCard />}
-          {activePanel === "contact" && <ContactCard />}
+          <CardFlipTransition
+            activePanel={activePanel}
+            onPresenceChange={setHasPanelInLayout}
+            renderPanel={renderPanel}
+          />
         </Box>
       </Container>
     </Box>

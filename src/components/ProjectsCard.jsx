@@ -66,17 +66,6 @@ function ProjectsCard() {
         backgroundColor: "#fafafa",
         maxHeight: { md: "75vh" },
         overflowY: "auto",
-        animation: "cardPop 500ms ease forwards",
-        "@keyframes cardPop": {
-          "0%": {
-            opacity: 0,
-            transform: "translateX(40px) scale(0.96)",
-          },
-          "100%": {
-            opacity: 1,
-            transform: "translateX(0) scale(1)",
-          },
-        },
       }}
     >
       <Stack spacing={3}>
