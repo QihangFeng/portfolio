@@ -16,17 +16,6 @@ function AboutCard() {
         overflow: "auto",
         borderColor: "divider",
         backgroundColor: "#fafafa",
-        animation: "cardPop 500ms ease forwards",
-        "@keyframes cardPop": {
-          "0%": {
-            opacity: 0,
-            transform: "translateX(40px) scale(0.96)",
-          },
-          "100%": {
-            opacity: 1,
-            transform: "translateX(0) scale(1)",
-          },
-        },
       }}
     >
       <Stack spacing={3}>
@@ -61,6 +50,10 @@ function AboutCard() {
 
             <Typography color="text.secondary" sx={{ mt: 1, ml: 0.6}}>
               Software Engineering MEng Student
+            </Typography>
+
+            <Typography color="text.secondary" sx={{ml: 0.6}}>
+              GPA, 3.9 / 4.0
             </Typography>
 
             <Typography color="text.secondary" sx={{ml: 0.6}}>

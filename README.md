@@ -24,3 +24,12 @@ https://qfeng.beaverexp.com/
 - JavaScript
 - GitHub Pages
 - GitHub Actions
+
+## Planned features
+
+**1. Card flip transition animation**  
+   Add a smoother card switching effect, similar to flipping or rotating a card, to make section transitions more polished.  
+**2. Expanded project detail view**  
+   Make each project card clickable and open a larger detail panel or modal window, where visitors can read more about the project background, methods, results, challenges, and technical implementation.  
+**3. Personal AI chatbot**  
+   Add a chatbot in the hero section that can answer questions about my background, skills, projects, resume, and learning experience based on selected personal documents and project files.  
