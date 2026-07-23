@@ -230,6 +230,12 @@ function ParticleFlowGroup({
       );
       const easedContentReveal =
         1 - (1 - contentRevealProgress) ** 2;
+      const liveContentProgress = Math.min(
+        1,
+        Math.max(0, (reassembleProgress - 0.72) / 0.28),
+      );
+      const easedLiveContent =
+        1 - (1 - liveContentProgress) ** 2;
       const particleOpacity =
         flowProgress < 1 ? easedDissolve : 1 - easedContentReveal;
       const liveRect = root.getBoundingClientRect();
@@ -258,7 +264,8 @@ function ParticleFlowGroup({
         targetSnapshot?.image
       ) {
         context.save();
-        context.globalAlpha = easedContentReveal;
+        context.globalAlpha =
+          easedContentReveal * (1 - easedLiveContent);
         context.drawImage(
           targetSnapshot.image,
           targetSnapshot.rect.left,
@@ -319,15 +326,20 @@ function ParticleFlowGroup({
       });
 
       root.style.opacity = targetSnapshot
-        ? "0"
+        ? String(easedLiveContent)
         : String(easedContentReveal);
 
       if (progress < 1) {
         animationFrame = requestAnimationFrame(drawFrame);
       } else {
-        root.style.opacity = "";
-        root.style.transitionProperty = originalTransitionProperty;
+        root.style.opacity = "1";
         flowCanvas.remove();
+
+        animationFrame = requestAnimationFrame(() => {
+          if (!active) return;
+          root.style.opacity = "";
+          root.style.transitionProperty = originalTransitionProperty;
+        });
 
         captureElementSnapshot(root, maxParticles).then((snapshot) => {
           if (!active) return;
