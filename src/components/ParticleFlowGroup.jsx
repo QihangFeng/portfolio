@@ -1,12 +1,12 @@
 import { useLayoutEffect, useRef } from "react";
 import { Box, useMediaQuery } from "@mui/material";
 
-const DISSOLVE_DURATION = 260;
-const FLOW_DURATION = 560;
-const REASSEMBLE_DURATION = 260;
+const DISSOLVE_DURATION = 90;
+const FLOW_DURATION = 400;
+const REASSEMBLE_DURATION = 110;
 const PARTICLE_DURATION =
   DISSOLVE_DURATION + FLOW_DURATION + REASSEMBLE_DURATION;
-const TARGET_CAPTURE_TIME = 500;
+const TARGET_CAPTURE_TIME = 430;
 let rendererPromise;
 
 function loadElementRenderer() {

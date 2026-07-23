@@ -27,7 +27,9 @@ function CardFlipTransition({
   const [transitionKind, setTransitionKind] = useState("flip");
   const [transitionEnabled, setTransitionEnabled] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [detachedLayout, setDetachedLayout] = useState(null);
 
+  const containerRef = useRef(null);
   const displayedPanelRef = useRef(requestedPanel);
   const requestedPanelRef = useRef(requestedPanel);
   const phaseRef = useRef("idle");
@@ -55,6 +57,7 @@ function CardFlipTransition({
     setIsAnimating(true);
 
     if (currentPanel === null) {
+      setDetachedLayout(null);
       onPresenceChange(true);
       displayedPanelRef.current = nextPanel;
       phaseRef.current = "preparing-enter";
@@ -69,6 +72,22 @@ function CardFlipTransition({
     }
 
     if (nextPanel === null) {
+      const container = containerRef.current;
+      const parent = container?.parentElement;
+
+      if (container && parent) {
+        const containerRect = container.getBoundingClientRect();
+        const parentRect = parent.getBoundingClientRect();
+
+        setDetachedLayout({
+          left: containerRect.left - parentRect.left,
+          top: containerRect.top - parentRect.top,
+          width: containerRect.width,
+          height: containerRect.height,
+        });
+      }
+
+      onPresenceChange(false);
       phaseRef.current = "exiting";
       setTransitionKind("slide-exit");
       setTransitionEnabled(true);
@@ -101,6 +120,7 @@ function CardFlipTransition({
         phaseRef.current = "idle";
         onPresenceChange(requestedPanelRef.current !== null);
         setIsAnimating(false);
+        setDetachedLayout(null);
         setTransitionEnabled(false);
         setDisplayedPanel(requestedPanelRef.current);
         setRotation(0);
@@ -133,6 +153,7 @@ function CardFlipTransition({
       phaseRef.current = "idle";
       onPresenceChange(false);
       setIsAnimating(false);
+      setDetachedLayout(null);
       setTransitionEnabled(false);
       setDisplayedPanel(null);
       setRotation(0);
@@ -185,7 +206,21 @@ function CardFlipTransition({
   if (displayedPanel === null && requestedPanel === null) return null;
 
   return (
-    <Box sx={{ minWidth: 0, perspective: "1200px" }}>
+    <Box
+      ref={containerRef}
+      sx={{
+        minWidth: 0,
+        perspective: "1200px",
+        ...(detachedLayout && {
+          position: "absolute",
+          left: `${detachedLayout.left}px`,
+          top: `${detachedLayout.top}px`,
+          width: `${detachedLayout.width}px`,
+          height: `${detachedLayout.height}px`,
+          zIndex: 2,
+        }),
+      }}
+    >
       <Box
         aria-hidden={isAnimating}
         onTransitionEnd={handleTransitionEnd}

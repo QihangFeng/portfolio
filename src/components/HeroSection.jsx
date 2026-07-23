@@ -63,6 +63,7 @@ function HeroSection({ activePanel, setActivePanel }) {
       <Container maxWidth="lg">
         <Box
           sx={{
+            position: "relative",
             display: "grid",
             gridTemplateColumns: {
               xs: "1fr",
