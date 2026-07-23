@@ -1,12 +1,12 @@
 import { useLayoutEffect, useRef } from "react";
 import { Box, useMediaQuery } from "@mui/material";
 
-const DISSOLVE_DURATION = 90;
+const DISSOLVE_DURATION = 80;
 const FLOW_DURATION = 400;
-const REASSEMBLE_DURATION = 110;
+const REASSEMBLE_DURATION = 150;
 const PARTICLE_DURATION =
   DISSOLVE_DURATION + FLOW_DURATION + REASSEMBLE_DURATION;
-const TARGET_CAPTURE_TIME = 430;
+const TARGET_CAPTURE_TIME = 390;
 let rendererPromise;
 
 function loadElementRenderer() {
@@ -143,6 +143,7 @@ function ParticleFlowGroup({
   const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const rootRef = useRef(null);
   const snapshotRef = useRef(null);
+  const snapshotCacheRef = useRef(new Map());
   const previousKeyRef = useRef(transitionKey);
 
   useLayoutEffect(() => {
@@ -161,7 +162,10 @@ function ParticleFlowGroup({
       previousKeyRef.current = transitionKey;
 
       captureElementSnapshot(root, maxParticles).then((snapshot) => {
-        if (active) snapshotRef.current = snapshot;
+        if (active) {
+          snapshotRef.current = snapshot;
+          snapshotCacheRef.current.set(transitionKey, snapshot);
+        }
       });
 
       return () => {
@@ -184,8 +188,9 @@ function ParticleFlowGroup({
     const { canvas, context } = createFlowCanvas();
     const startTime = performance.now();
     const originalTransitionProperty = root.style.transitionProperty;
-    let targetSnapshot = null;
-    let targetCaptureStarted = false;
+    let targetSnapshot =
+      snapshotCacheRef.current.get(transitionKey) ?? null;
+    let targetCaptureStarted = Boolean(targetSnapshot);
 
     flowCanvas = canvas;
     root.style.transitionProperty =
@@ -200,6 +205,7 @@ function ParticleFlowGroup({
         if (!active) return;
         targetSnapshot = snapshot;
         snapshotRef.current = snapshot;
+        snapshotCacheRef.current.set(transitionKey, snapshot);
       });
     }
 
@@ -218,9 +224,14 @@ function ParticleFlowGroup({
         1,
       );
       const easedDissolve = 1 - (1 - dissolveProgress) ** 3;
-      const easedReassemble = reassembleProgress ** 2;
+      const contentRevealProgress = Math.min(
+        1,
+        Math.max(0, (reassembleProgress - 0.22) / 0.78),
+      );
+      const easedContentReveal =
+        1 - (1 - contentRevealProgress) ** 2;
       const particleOpacity =
-        flowProgress < 1 ? easedDissolve : 1 - easedReassemble;
+        flowProgress < 1 ? easedDissolve : 1 - easedContentReveal;
       const liveRect = root.getBoundingClientRect();
 
       if (elapsed >= TARGET_CAPTURE_TIME) {
@@ -238,6 +249,22 @@ function ParticleFlowGroup({
           previousSnapshot.rect.top,
           previousSnapshot.rect.width,
           previousSnapshot.rect.height,
+        );
+        context.restore();
+      }
+
+      if (
+        contentRevealProgress > 0 &&
+        targetSnapshot?.image
+      ) {
+        context.save();
+        context.globalAlpha = easedContentReveal;
+        context.drawImage(
+          targetSnapshot.image,
+          targetSnapshot.rect.left,
+          targetSnapshot.rect.top,
+          targetSnapshot.rect.width,
+          targetSnapshot.rect.height,
         );
         context.restore();
       }
@@ -291,7 +318,9 @@ function ParticleFlowGroup({
         context.fill();
       });
 
-      root.style.opacity = String(easedReassemble);
+      root.style.opacity = targetSnapshot
+        ? "0"
+        : String(easedContentReveal);
 
       if (progress < 1) {
         animationFrame = requestAnimationFrame(drawFrame);
@@ -300,7 +329,11 @@ function ParticleFlowGroup({
         root.style.transitionProperty = originalTransitionProperty;
         flowCanvas.remove();
 
-        if (!targetCaptureStarted) beginTargetCapture();
+        captureElementSnapshot(root, maxParticles).then((snapshot) => {
+          if (!active) return;
+          snapshotRef.current = snapshot;
+          snapshotCacheRef.current.set(transitionKey, snapshot);
+        });
       }
     }
 

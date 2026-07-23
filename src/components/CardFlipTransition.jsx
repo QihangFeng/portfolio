@@ -73,15 +73,13 @@ function CardFlipTransition({
 
     if (nextPanel === null) {
       const container = containerRef.current;
-      const parent = container?.parentElement;
 
-      if (container && parent) {
+      if (container) {
         const containerRect = container.getBoundingClientRect();
-        const parentRect = parent.getBoundingClientRect();
 
         setDetachedLayout({
-          left: containerRect.left - parentRect.left,
-          top: containerRect.top - parentRect.top,
+          left: containerRect.left,
+          top: containerRect.top,
           width: containerRect.width,
           height: containerRect.height,
         });
@@ -212,7 +210,7 @@ function CardFlipTransition({
         minWidth: 0,
         perspective: "1200px",
         ...(detachedLayout && {
-          position: "absolute",
+          position: "fixed",
           left: `${detachedLayout.left}px`,
           top: `${detachedLayout.top}px`,
           width: `${detachedLayout.width}px`,
