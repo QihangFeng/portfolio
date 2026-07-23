@@ -6,6 +6,7 @@ import {
   IconButton,
   Stack,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -19,6 +20,7 @@ import SkillsCard from "./SkillsCard";
 import ProjectsCard from "./ProjectsCard";
 import ContactCard from "./ContactCard";
 import CardFlipTransition from "./CardFlipTransition";
+import ParticleText from "./ParticleText";
 
 const panelComponents = {
   about: AboutCard,
@@ -35,6 +37,28 @@ function renderPanel(panel) {
 function HeroSection({ activePanel, setActivePanel }) {
   const hasActivePanel = activePanel !== "home";
   const [hasPanelInLayout, setHasPanelInLayout] = useState(hasActivePanel);
+  const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+
+  function supportingTextMotion(delay) {
+    if (reduceMotion) return {};
+
+    return {
+      "--home-text-offset": hasPanelInLayout ? "14px" : "-14px",
+      animation:
+        "home-supporting-text 500ms cubic-bezier(0.22, 1, 0.36, 1) both",
+      animationDelay: `${delay}ms`,
+      "@keyframes home-supporting-text": {
+        from: {
+          opacity: 0.45,
+          transform: "translateX(var(--home-text-offset))",
+        },
+        to: {
+          opacity: 1,
+          transform: "translateX(0)",
+        },
+      },
+    };
+  }
 
   function handleMainButtonClick() {
     if (!hasActivePanel) {
@@ -82,8 +106,11 @@ function HeroSection({ activePanel, setActivePanel }) {
               transition: "all 500ms ease",
             }}
           >
-            <Typography
+            <ParticleText
               variant="overline"
+              transitionKey={hasPanelInLayout}
+              direction={hasPanelInLayout ? -1 : 1}
+              maxParticles={760}
               sx={{
                 color: "primary.main",
                 fontWeight: 700,
@@ -91,11 +118,14 @@ function HeroSection({ activePanel, setActivePanel }) {
               }}
             >
               Software Engineering Portfolio · Work in Progress
-            </Typography>
+            </ParticleText>
 
-            <Typography
+            <ParticleText
               variant="h2"
               component="h1"
+              transitionKey={hasPanelInLayout}
+              direction={hasPanelInLayout ? -1 : 1}
+              delay={55}
               sx={{
                 mt: 1,
                 fontWeight: 800,
@@ -107,14 +137,16 @@ function HeroSection({ activePanel, setActivePanel }) {
               }}
             >
               Hi, I’m Qihang Feng.
-            </Typography>
+            </ParticleText>
 
             <Typography
+              key={`subtitle-${hasPanelInLayout}`}
               variant="h5"
               sx={{
                 mt: 2,
                 color: "text.secondary",
                 lineHeight: 1.5,
+                ...supportingTextMotion(70),
               }}
             >
               MEng student building full stack applications and machine learning
@@ -122,11 +154,13 @@ function HeroSection({ activePanel, setActivePanel }) {
             </Typography>
 
             <Typography
+              key={`description-${hasPanelInLayout}`}
               variant="body1"
               sx={{
                 mt: 3,
                 color: "text.secondary",
                 lineHeight: 1.8,
+                ...supportingTextMotion(120),
               }}
             >
               I focus on practical software development, reproducible machine
@@ -135,9 +169,10 @@ function HeroSection({ activePanel, setActivePanel }) {
             </Typography>
 
             <Stack
+              key={`actions-${hasPanelInLayout}`}
               direction={{ xs: "column", sm: "row" }}
               spacing={2}
-              sx={{ mt: 4 }}
+              sx={{ mt: 4, ...supportingTextMotion(165) }}
             >
               <Button
                 variant="contained"
@@ -183,11 +218,13 @@ function HeroSection({ activePanel, setActivePanel }) {
             </Stack>
 
             <Stack
+              key={`socials-${hasPanelInLayout}`}
               direction="row"
               spacing={2}
               sx={{
                 mt: 4,
                 alignItems: "center",
+                ...supportingTextMotion(210),
               }}
             >
               <IconButton
