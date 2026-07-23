@@ -56,6 +56,7 @@ function HeroSection({ activePanel, setActivePanel }) {
       component="section"
       sx={{
         py: { xs: 4, md: 6 },
+        overflowX: "clip",
       }}
     >
       <Container maxWidth="lg">

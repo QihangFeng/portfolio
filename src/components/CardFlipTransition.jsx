@@ -2,6 +2,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Box, useMediaQuery } from "@mui/material";
 
 const HALF_FLIP_DURATION = 220;
+const SLIDE_DURATION = 480;
+const SLIDE_ENTER_EASING = "cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+const SLIDE_EXIT_EASING = "cubic-bezier(0.55, 0.06, 0.68, 0.19)";
+const PANEL_ORDER = ["about", "skills", "projects", "contact"];
+
+function getFlipDirection(currentPanel, nextPanel) {
+  return PANEL_ORDER.indexOf(nextPanel) > PANEL_ORDER.indexOf(currentPanel)
+    ? 1
+    : -1;
+}
 
 function CardFlipTransition({
   activePanel,
@@ -12,20 +22,26 @@ function CardFlipTransition({
   const requestedPanel = activePanel === "home" ? null : activePanel;
   const [displayedPanel, setDisplayedPanel] = useState(requestedPanel);
   const [rotation, setRotation] = useState(0);
+  const [slideOffset, setSlideOffset] = useState("0px");
+  const [opacity, setOpacity] = useState(1);
+  const [transitionKind, setTransitionKind] = useState("flip");
   const [transitionEnabled, setTransitionEnabled] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
   const displayedPanelRef = useRef(requestedPanel);
   const requestedPanelRef = useRef(requestedPanel);
   const phaseRef = useRef("idle");
+  const flipDirectionRef = useRef(1);
   const frameRef = useRef(null);
 
-  const scheduleFlipIn = useCallback(() => {
+  const scheduleToRest = useCallback((phase) => {
     frameRef.current = requestAnimationFrame(() => {
       frameRef.current = requestAnimationFrame(() => {
-        phaseRef.current = "in";
+        phaseRef.current = phase;
         setTransitionEnabled(true);
         setRotation(0);
+        setSlideOffset("0px");
+        setOpacity(1);
       });
     });
   }, []);
@@ -41,18 +57,35 @@ function CardFlipTransition({
     if (currentPanel === null) {
       onPresenceChange(true);
       displayedPanelRef.current = nextPanel;
-      phaseRef.current = "preparing-in";
+      phaseRef.current = "preparing-enter";
       setTransitionEnabled(false);
+      setTransitionKind("slide-enter");
       setDisplayedPanel(nextPanel);
-      setRotation(-90);
-      scheduleFlipIn();
+      setRotation(0);
+      setSlideOffset("100vw");
+      setOpacity(0);
+      scheduleToRest("entering");
       return;
     }
 
-    phaseRef.current = "out";
+    if (nextPanel === null) {
+      phaseRef.current = "exiting";
+      setTransitionKind("slide-exit");
+      setTransitionEnabled(true);
+      setRotation(0);
+      setSlideOffset("100vw");
+      setOpacity(0);
+      return;
+    }
+
+    flipDirectionRef.current = getFlipDirection(currentPanel, nextPanel);
+    phaseRef.current = "flip-out";
+    setTransitionKind("flip");
     setTransitionEnabled(true);
-    setRotation(90);
-  }, [onPresenceChange, scheduleFlipIn]);
+    setSlideOffset("0px");
+    setOpacity(0.55);
+    setRotation(90 * flipDirectionRef.current);
+  }, [onPresenceChange, scheduleToRest]);
 
   useEffect(() => {
     requestedPanelRef.current = requestedPanel;
@@ -71,6 +104,8 @@ function CardFlipTransition({
         setTransitionEnabled(false);
         setDisplayedPanel(requestedPanelRef.current);
         setRotation(0);
+        setSlideOffset("0px");
+        setOpacity(1);
         return;
       }
 
@@ -93,7 +128,20 @@ function CardFlipTransition({
       return;
     }
 
-    if (phaseRef.current === "out") {
+    if (phaseRef.current === "exiting") {
+      displayedPanelRef.current = null;
+      phaseRef.current = "idle";
+      onPresenceChange(false);
+      setIsAnimating(false);
+      setTransitionEnabled(false);
+      setDisplayedPanel(null);
+      setRotation(0);
+      setSlideOffset("0px");
+      setOpacity(1);
+      return;
+    }
+
+    if (phaseRef.current === "flip-out") {
       const nextPanel = requestedPanelRef.current;
 
       setTransitionEnabled(false);
@@ -105,18 +153,25 @@ function CardFlipTransition({
         setIsAnimating(false);
         setDisplayedPanel(null);
         setRotation(0);
+        setSlideOffset("0px");
+        setOpacity(1);
         return;
       }
 
       displayedPanelRef.current = nextPanel;
-      phaseRef.current = "preparing-in";
+      phaseRef.current = "preparing-flip-in";
       setDisplayedPanel(nextPanel);
-      setRotation(-90);
-      scheduleFlipIn();
+      setRotation(-90 * flipDirectionRef.current);
+      setSlideOffset("0px");
+      setOpacity(0.55);
+      scheduleToRest("flip-in");
       return;
     }
 
-    if (phaseRef.current === "in") {
+    if (
+      phaseRef.current === "entering" ||
+      phaseRef.current === "flip-in"
+    ) {
       phaseRef.current = "idle";
       setIsAnimating(false);
       setTransitionEnabled(false);
@@ -136,14 +191,20 @@ function CardFlipTransition({
         onTransitionEnd={handleTransitionEnd}
         sx={{
           minWidth: 0,
-          transform: `rotateY(${rotation}deg)`,
+          transform: `translateX(${slideOffset}) rotateY(${rotation}deg)`,
           transformOrigin: "center",
           transformStyle: "preserve-3d",
           backfaceVisibility: "hidden",
-          opacity: rotation === 0 ? 1 : 0.55,
+          opacity,
           pointerEvents: isAnimating ? "none" : "auto",
           transition: transitionEnabled
-            ? `transform ${HALF_FLIP_DURATION}ms ease-in-out, opacity ${HALF_FLIP_DURATION}ms ease-in-out`
+            ? transitionKind === "flip"
+              ? `transform ${HALF_FLIP_DURATION}ms ease-in-out, opacity ${HALF_FLIP_DURATION}ms ease-in-out`
+              : `transform ${SLIDE_DURATION}ms ${
+                  transitionKind === "slide-enter"
+                    ? SLIDE_ENTER_EASING
+                    : SLIDE_EXIT_EASING
+                }, opacity ${SLIDE_DURATION}ms ease`
             : "none",
           willChange: transitionEnabled ? "transform, opacity" : "auto",
         }}
