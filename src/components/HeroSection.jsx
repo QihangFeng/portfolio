@@ -156,7 +156,7 @@ function HeroSection({ activePanel, setActivePanel }) {
                   width: { xs: "100%", sm: "fit-content" },
                 }}
               >
-                {hasActivePanel ? "Next" : "Start"}
+                {hasPanelInLayout ? "Next" : "Start"}
               </Button>
 
               <Button
