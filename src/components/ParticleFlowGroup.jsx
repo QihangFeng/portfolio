@@ -1,12 +1,11 @@
 import { useLayoutEffect, useRef } from "react";
 import { Box, useMediaQuery } from "@mui/material";
 
-const DISSOLVE_DURATION = 80;
+const DISSOLVE_DURATION = 100;
 const FLOW_DURATION = 400;
 const REASSEMBLE_DURATION = 150;
 const PARTICLE_DURATION =
   DISSOLVE_DURATION + FLOW_DURATION + REASSEMBLE_DURATION;
-const TARGET_CAPTURE_TIME = 390;
 let rendererPromise;
 
 function loadElementRenderer() {
@@ -22,10 +21,14 @@ function seededValue(seed) {
 }
 
 async function captureElementSnapshot(root, maxParticles) {
-  const rootRect = root.getBoundingClientRect();
   const marker = `particle-flow-${performance.now()}-${Math.random()}`;
   const html2canvas = await loadElementRenderer();
+  const rootRect = root.getBoundingClientRect();
+  const sourceElement = root.cloneNode(true);
 
+  sourceElement.style.opacity = "1";
+  sourceElement.style.visibility = "visible";
+  sourceElement.style.transition = "none";
   root.dataset.particleFlowCapture = marker;
 
   try {
@@ -95,12 +98,38 @@ async function captureElementSnapshot(root, maxParticles) {
       rect: rootRect,
       image: renderedElement,
       particles: sampledParticles,
+      sourceElement,
     };
   } finally {
     if (root.dataset.particleFlowCapture === marker) {
       delete root.dataset.particleFlowCapture;
     }
   }
+}
+
+function createSourceOverlay(snapshot) {
+  if (!snapshot.sourceElement) return null;
+
+  const overlay = snapshot.sourceElement.cloneNode(true);
+
+  overlay.setAttribute("aria-hidden", "true");
+  Object.assign(overlay.style, {
+    position: "fixed",
+    left: `${snapshot.rect.left}px`,
+    top: `${snapshot.rect.top}px`,
+    width: `${snapshot.rect.width}px`,
+    height: `${snapshot.rect.height}px`,
+    margin: "0",
+    maxWidth: "none",
+    transform: "none",
+    transition: "none",
+    opacity: "1",
+    zIndex: "1199",
+    pointerEvents: "none",
+  });
+  document.body.appendChild(overlay);
+
+  return overlay;
 }
 
 function createFlowCanvas() {
@@ -143,7 +172,6 @@ function ParticleFlowGroup({
   const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const rootRef = useRef(null);
   const snapshotRef = useRef(null);
-  const snapshotCacheRef = useRef(new Map());
   const previousKeyRef = useRef(transitionKey);
 
   useLayoutEffect(() => {
@@ -153,6 +181,9 @@ function ParticleFlowGroup({
     let active = true;
     let animationFrame;
     let flowCanvas;
+    let sourceOverlay;
+    let layoutContainer;
+    let originalLayoutTransitionProperty;
 
     if (
       previousKeyRef.current === transitionKey ||
@@ -164,7 +195,6 @@ function ParticleFlowGroup({
       captureElementSnapshot(root, maxParticles).then((snapshot) => {
         if (active) {
           snapshotRef.current = snapshot;
-          snapshotCacheRef.current.set(transitionKey, snapshot);
         }
       });
 
@@ -185,17 +215,25 @@ function ParticleFlowGroup({
         curve: (seededValue(seed + 7.7) - 0.5) * 68,
       };
     });
+    sourceOverlay = createSourceOverlay(previousSnapshot);
     const { canvas, context } = createFlowCanvas();
     const startTime = performance.now();
     const originalTransitionProperty = root.style.transitionProperty;
-    let targetSnapshot =
-      snapshotCacheRef.current.get(transitionKey) ?? null;
-    let targetCaptureStarted = Boolean(targetSnapshot);
+    let targetSnapshot = null;
+    let targetCaptureStarted = false;
+    let targetWaitStarted = null;
+    let accumulatedTargetWait = 0;
 
     flowCanvas = canvas;
-    root.style.transitionProperty =
-      "max-width, margin-left, margin-right, transform";
+    layoutContainer = root.parentElement;
+    originalLayoutTransitionProperty =
+      layoutContainer?.style.transitionProperty ?? "";
+    root.style.transitionProperty = "none";
+    if (layoutContainer) {
+      layoutContainer.style.transitionProperty = "none";
+    }
     root.style.opacity = "0";
+    root.getBoundingClientRect();
 
     function beginTargetCapture() {
       if (targetCaptureStarted) return;
@@ -205,12 +243,27 @@ function ParticleFlowGroup({
         if (!active) return;
         targetSnapshot = snapshot;
         snapshotRef.current = snapshot;
-        snapshotCacheRef.current.set(transitionKey, snapshot);
       });
     }
 
     function drawFrame(now) {
-      const elapsed = Math.max(0, now - startTime);
+      let elapsed = Math.max(
+        0,
+        now - startTime - accumulatedTargetWait,
+      );
+
+      if (!targetSnapshot && elapsed >= DISSOLVE_DURATION) {
+        targetWaitStarted ??= now;
+        elapsed = DISSOLVE_DURATION;
+      } else if (targetSnapshot && targetWaitStarted !== null) {
+        accumulatedTargetWait += now - targetWaitStarted;
+        targetWaitStarted = null;
+        elapsed = Math.max(
+          0,
+          now - startTime - accumulatedTargetWait,
+        );
+      }
+
       const progress = Math.min(elapsed / PARTICLE_DURATION, 1);
       const dissolveProgress = Math.min(elapsed / DISSOLVE_DURATION, 1);
       const flowElapsed = Math.max(0, elapsed - DISSOLVE_DURATION);
@@ -223,7 +276,16 @@ function ParticleFlowGroup({
         reassembleElapsed / REASSEMBLE_DURATION,
         1,
       );
-      const easedDissolve = 1 - (1 - dissolveProgress) ** 3;
+      const particleFormationProgress =
+        easeInOutCubic(
+          Math.min(1, dissolveProgress / 0.58),
+        );
+      const sourceFadeProgress = easeInOutCubic(
+        Math.min(
+          1,
+          Math.max(0, (dissolveProgress - 0.58) / 0.42),
+        ),
+      );
       const contentRevealProgress = Math.min(
         1,
         Math.max(0, (reassembleProgress - 0.22) / 0.78),
@@ -237,18 +299,23 @@ function ParticleFlowGroup({
       const easedLiveContent =
         1 - (1 - liveContentProgress) ** 2;
       const particleOpacity =
-        flowProgress < 1 ? easedDissolve : 1 - easedContentReveal;
+        flowProgress < 1
+          ? particleFormationProgress
+          : 1 - easedContentReveal;
       const liveRect = root.getBoundingClientRect();
-
-      if (elapsed >= TARGET_CAPTURE_TIME) {
-        beginTargetCapture();
-      }
 
       context.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-      if (dissolveProgress < 1 && previousSnapshot.image) {
+      if (sourceOverlay) {
+        sourceOverlay.style.opacity = String(1 - sourceFadeProgress);
+
+        if (dissolveProgress >= 1) {
+          sourceOverlay.remove();
+          sourceOverlay = null;
+        }
+      } else if (dissolveProgress < 1 && previousSnapshot.image) {
         context.save();
-        context.globalAlpha = 1 - easedDissolve;
+        context.globalAlpha = 1 - sourceFadeProgress;
         context.drawImage(
           previousSnapshot.image,
           previousSnapshot.rect.left,
@@ -339,16 +406,20 @@ function ParticleFlowGroup({
           if (!active) return;
           root.style.opacity = "";
           root.style.transitionProperty = originalTransitionProperty;
+          if (layoutContainer) {
+            layoutContainer.style.transitionProperty =
+              originalLayoutTransitionProperty;
+          }
         });
 
         captureElementSnapshot(root, maxParticles).then((snapshot) => {
           if (!active) return;
           snapshotRef.current = snapshot;
-          snapshotCacheRef.current.set(transitionKey, snapshot);
         });
       }
     }
 
+    beginTargetCapture();
     drawFrame(performance.now());
 
     return () => {
@@ -356,6 +427,11 @@ function ParticleFlowGroup({
       cancelAnimationFrame(animationFrame);
       root.style.opacity = "";
       root.style.transitionProperty = originalTransitionProperty;
+      if (layoutContainer) {
+        layoutContainer.style.transitionProperty =
+          originalLayoutTransitionProperty;
+      }
+      sourceOverlay?.remove();
       flowCanvas?.remove();
     };
   }, [direction, maxParticles, reduceMotion, transitionKey]);

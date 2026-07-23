@@ -201,7 +201,7 @@ function CardFlipTransition({
     }
   }
 
-  if (displayedPanel === null && requestedPanel === null) return null;
+  if (displayedPanel === null) return null;
 
   return (
     <Box
