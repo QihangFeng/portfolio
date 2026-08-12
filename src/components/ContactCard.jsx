@@ -4,13 +4,13 @@ import {
   Box,
   Button,
   Divider,
-  Paper,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 
 import EmailIcon from "@mui/icons-material/Email";
+import LiquidGlassCard from "./LiquidGlassCard";
 
 function ContactCard() {
   const formRef = useRef(null);
@@ -40,8 +40,7 @@ function ContactCard() {
   }
 
   return (
-    <Paper
-      elevation={0}
+    <LiquidGlassCard
       sx={{
         p: { xs: 3, md: 4 },
         borderRadius: 4,
@@ -190,7 +189,7 @@ function ContactCard() {
           </Stack>
         </Box>
       </Stack>
-    </Paper>
+    </LiquidGlassCard>
   );
 }
 

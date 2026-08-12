@@ -1,13 +1,13 @@
-import { Avatar, Box, Divider, Paper, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Divider, Stack, Typography } from "@mui/material";
 
 import SchoolIcon from "@mui/icons-material/School";
 import WorkIcon from "@mui/icons-material/Work";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import LiquidGlassCard from "./LiquidGlassCard";
 
 function AboutCard() {
   return (
-    <Paper
-      elevation={0}
+    <LiquidGlassCard
       sx={{
         p: { xs: 3, md: 4 },
         borderRadius: 4,
@@ -175,7 +175,7 @@ function AboutCard() {
           </Stack>
         </Box>
       </Stack>
-    </Paper>
+    </LiquidGlassCard>
   );
 }
 

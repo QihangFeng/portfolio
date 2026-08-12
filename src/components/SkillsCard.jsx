@@ -1,4 +1,4 @@
-import { Box, Chip, Divider, Paper, Stack, Typography } from "@mui/material";
+import { Box, Chip, Divider, Stack, Typography } from "@mui/material";
 
 import StorageIcon from "@mui/icons-material/Storage";
 import DnsIcon from "@mui/icons-material/Dns";
@@ -6,6 +6,7 @@ import PsychologyIcon from "@mui/icons-material/Psychology";
 import TerminalIcon from "@mui/icons-material/Terminal";
 import BuildIcon from "@mui/icons-material/Build";
 import WebIcon from "@mui/icons-material/Web";
+import LiquidGlassCard from "./LiquidGlassCard";
 
 function SkillsCard() {
   const skillGroups = [
@@ -42,8 +43,7 @@ function SkillsCard() {
   ];
 
   return (
-    <Paper
-      elevation={0}
+    <LiquidGlassCard
       sx={{
         p: { xs: 3, md: 4 },
         borderRadius: 4,
@@ -122,7 +122,7 @@ function SkillsCard() {
           ))}
         </Stack>
       </Stack>
-    </Paper>
+    </LiquidGlassCard>
   );
 }
 

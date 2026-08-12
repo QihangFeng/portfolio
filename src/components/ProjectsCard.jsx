@@ -14,6 +14,7 @@ import PsychologyIcon from "@mui/icons-material/Psychology";
 import ImageSearchIcon from "@mui/icons-material/ImageSearch";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import WebIcon from "@mui/icons-material/Web";
+import LiquidGlassCard from "./LiquidGlassCard";
 
 function ProjectsCard() {
   const projects = [
@@ -56,8 +57,7 @@ function ProjectsCard() {
   ];
 
   return (
-    <Paper
-      elevation={0}
+    <LiquidGlassCard
       sx={{
         p: { xs: 3, md: 4 },
         borderRadius: 4,
@@ -162,7 +162,7 @@ function ProjectsCard() {
           ))}
         </Stack>
       </Stack>
-    </Paper>
+    </LiquidGlassCard>
   );
 }
 
