@@ -1,68 +1,14 @@
-import { useId, useRef } from "react";
+import { useId } from "react";
 import { Box, Paper } from "@mui/material";
 
 function LiquidGlassCard({ children, sx, ...paperProps }) {
-  const rootRef = useRef(null);
-  const filterFrameRef = useRef(null);
   const filterId = `liquid-glass-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
-
-  function handlePointerMove(event) {
-    const root = rootRef.current;
-    if (!root || event.pointerType === "touch") return;
-
-    const rect = root.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / Math.max(rect.width, 1)) * 100;
-    const y = ((event.clientY - rect.top) / Math.max(rect.height, 1)) * 100;
-    const angle =
-      (Math.atan2(event.clientY - (rect.top + rect.height / 2), event.clientX - (rect.left + rect.width / 2)) *
-        180) /
-        Math.PI +
-      90;
-
-    if (filterFrameRef.current !== null) {
-      cancelAnimationFrame(filterFrameRef.current);
-    }
-
-    filterFrameRef.current = requestAnimationFrame(() => {
-      const currentRoot = rootRef.current;
-      filterFrameRef.current = null;
-      if (!currentRoot) return;
-
-      currentRoot.style.setProperty("--glass-x", `${Math.min(100, Math.max(0, x))}%`);
-      currentRoot.style.setProperty("--glass-y", `${Math.min(100, Math.max(0, y))}%`);
-      currentRoot.style.setProperty("--glass-angle", `${angle}deg`);
-      currentRoot.style.setProperty("--glass-gloss-opacity", "0.62");
-      currentRoot.style.setProperty("--glass-rim-opacity", "1");
-    });
-  }
-
-  function handlePointerLeave() {
-    const root = rootRef.current;
-    if (!root) return;
-
-    if (filterFrameRef.current !== null) {
-      cancelAnimationFrame(filterFrameRef.current);
-      filterFrameRef.current = null;
-    }
-
-    root.style.setProperty("--glass-x", "24%");
-    root.style.setProperty("--glass-y", "10%");
-    root.style.setProperty("--glass-angle", "128deg");
-    root.style.setProperty("--glass-gloss-opacity", "0.34");
-    root.style.setProperty("--glass-rim-opacity", "0.94");
-  }
 
   return (
     <Box
-      ref={rootRef}
       data-liquid-glass-card="true"
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerLeave}
       sx={{
-        "--glass-x": "24%",
-        "--glass-y": "10%",
         "--glass-angle": "128deg",
-        "--glass-gloss-opacity": "0.34",
         "--glass-rim-opacity": "0.94",
         position: "relative",
         minWidth: 0,
@@ -147,23 +93,6 @@ function LiquidGlassCard({ children, sx, ...paperProps }) {
         }}
       />
 
-      <Box
-        aria-hidden="true"
-        sx={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 2,
-          borderRadius: "inherit",
-          pointerEvents: "none",
-          overflow: "hidden",
-          opacity: "var(--glass-gloss-opacity)",
-          mixBlendMode: "screen",
-          backgroundImage:
-            "radial-gradient(ellipse 34% 17% at var(--glass-x) var(--glass-y), rgba(255,255,255,0.84) 0%, rgba(255,255,255,0.24) 34%, transparent 72%), linear-gradient(132deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 24%, transparent 42%)",
-          transition: "opacity 180ms ease",
-        }}
-      />
-
       <Paper
         {...paperProps}
         elevation={0}
@@ -181,6 +110,23 @@ function LiquidGlassCard({ children, sx, ...paperProps }) {
       >
         {children}
       </Paper>
+
+      <Box
+        aria-hidden="true"
+        sx={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 3,
+          borderRadius: "inherit",
+          overflow: "hidden",
+          pointerEvents: "none",
+          backgroundColor: "rgba(255, 255, 255, 0.018)",
+          backgroundImage:
+            "radial-gradient(ellipse 180% 145% at 8% -18%, rgba(255,255,255,0.105) 0%, rgba(255,255,255,0.035) 50%, transparent 76%)",
+          boxShadow:
+            "inset 3px 3px 6px rgba(255,255,255,0.28), inset -5px -6px 9px rgba(51,65,85,0.11), inset 10px 10px 18px -16px rgba(255,255,255,0.58), inset -12px -14px 20px -16px rgba(15,23,42,0.22), inset 0 0 16px rgba(255,255,255,0.018)",
+        }}
+      />
 
       <Box
         aria-hidden="true"
