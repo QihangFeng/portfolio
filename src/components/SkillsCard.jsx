@@ -45,12 +45,20 @@ function SkillsCard() {
 
         <Divider />
 
-        <Stack spacing={2.5}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
+            gap: 2.5,
+            alignItems: "stretch",
+          }}
+        >
           {profile.skillGroups.map((group) => (
             <Box
               key={group.title}
               sx={{
                 p: 2,
+                minWidth: 0,
                 borderRadius: 3,
                 backgroundColor: "white",
                 border: "1px solid",
@@ -80,8 +88,7 @@ function SkillsCard() {
                 direction="row"
                 spacing={1}
                 useFlexGap
-                flexWrap="wrap"
-                sx={{ mt: 2 }}
+                sx={{ mt: 2, flexWrap: "wrap" }}
               >
                 {group.skills.map((skill) => (
                   <Chip
@@ -97,7 +104,7 @@ function SkillsCard() {
               </Stack>
             </Box>
           ))}
-        </Stack>
+        </Box>
       </Stack>
     </LiquidGlassCard>
   );

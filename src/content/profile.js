@@ -47,34 +47,34 @@ const profile = {
   },
   skillGroups: [
     {
+      id: "backend",
+      title: "Backend & APIs",
+      skills: ["FastAPI", "Node.js", "Express", "REST APIs"],
+    },
+    {
       id: "frontend",
-      title: "Frontend Development",
+      title: "Frontend",
       skills: ["React", "JavaScript", "Vite", "Material UI"],
     },
     {
-      id: "backend",
-      title: "Backend Development",
-      skills: ["Node.js", "Express", "REST APIs", "FastAPI"],
+      id: "machineLearning",
+      title: "AI & Machine Learning",
+      skills: ["Python", "PyTorch", "OpenCV", "scikit-learn"],
     },
     {
       id: "databases",
-      title: "Databases",
-      skills: ["SQL", "MySQL", "PostgreSQL"],
-    },
-    {
-      id: "machineLearning",
-      title: "Machine Learning and Data",
-      skills: ["Python", "PyTorch", "OpenCV", "scikit-learn", "R"],
+      title: "Databases & ORM",
+      skills: ["PostgreSQL", "SQL", "SQLAlchemy", "Alembic"],
     },
     {
       id: "foundations",
-      title: "Programming Foundations",
-      skills: ["Rust", "C", "C++", "Java"],
+      title: "Languages",
+      skills: ["Python", "JavaScript", "SQL", "C++", "Rust"],
     },
     {
       id: "tools",
-      title: "Tools and Workflow",
-      skills: ["Git", "GitHub", "VS Code", "JupyterLab"],
+      title: "Tools & Workflow",
+      skills: ["Git", "GitHub", "pytest", "VS Code", "JupyterLab"],
     },
   ],
   projects: [
