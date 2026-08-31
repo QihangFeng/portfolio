@@ -22,12 +22,15 @@ const profile = {
     graduation: "Expected Graduation, May 2027",
     experience: [
       {
-        title: "Data Assistant, Campus AI Pilot Program",
-        period: "Apr 2023 - Jul 2023",
+        title: "Research Assistant, Agentic AI Benchmarking",
+        period: "May 2026 - Present",
         location:
-          "Nanjing University of Posts and Telecommunications, China",
-        description:
-          "Reviewed model outputs, corrected labels, automated validation checks with Python, and documented reproducible issues for follow-up analysis.",
+          "University of Alberta, Edmonton, AB, Canada",
+        highlights: [
+          "Built a Python benchmark covering 15,584 trajectories from eight agent datasets.",
+          "Evaluated LLM methods for locating failures at the agent and step levels.",
+          "Developed validation tools to improve data quality.",
+        ],
       },
     ],
     education: [

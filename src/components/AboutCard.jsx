@@ -101,13 +101,27 @@ function AboutCard() {
                 </Typography>
               </Stack>
 
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                sx={{ mt: 1.5, lineHeight: 1.5 }}
+              <Box
+                component="ul"
+                sx={{
+                  mt: 1.5,
+                  mb: 0,
+                  pl: 2.5,
+                  color: "text.secondary",
+                  "& li + li": { mt: 0.75 },
+                }}
               >
-                {experience.description}
-              </Typography>
+                {experience.highlights.map((highlight) => (
+                  <Typography
+                    component="li"
+                    variant="body1"
+                    key={highlight}
+                    sx={{ lineHeight: 1.5 }}
+                  >
+                    {highlight}
+                  </Typography>
+                ))}
+              </Box>
             </Box>
           ))}
         </Box>
