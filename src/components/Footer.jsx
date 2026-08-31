@@ -1,4 +1,6 @@
 import { Box, Typography } from "@mui/material";
+import profile from "../content/profile";
+import uiText from "../content/uiText";
 
 function Footer() {
   return (
@@ -13,7 +15,7 @@ function Footer() {
       }}
     >
       <Typography variant="body2" color="text.secondary" sx={{textAlign: 'center'}}>
-        © {new Date().getFullYear()} Qihang Feng. All rights reserved.
+        © {new Date().getFullYear()} {profile.name}. {uiText.footer.rightsReserved}
       </Typography>
     </Box>
   );

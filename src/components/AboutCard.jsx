@@ -4,6 +4,8 @@ import SchoolIcon from "@mui/icons-material/School";
 import WorkIcon from "@mui/icons-material/Work";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import LiquidGlassCard from "./LiquidGlassCard";
+import profile from "../content/profile";
+import uiText from "../content/uiText";
 
 function AboutCard() {
   return (
@@ -33,31 +35,31 @@ function AboutCard() {
               bgcolor: "primary.main",
             }}
           >
-            QF
+            {profile.initials}
           </Avatar>
 
           <Box sx={{ width: "65%" }}>
             <Typography variant="h4" sx={{ fontWeight: 600 }}>
-              Qihang Feng
+              {profile.name}
             </Typography>
 
             <Stack direction={"row"} sx={{ alignItems: "center" }}>
               <LocationOnIcon />
               <Typography color="text.secondary">
-                Edmonton, AB, Canada
+                {profile.about.location}
               </Typography>
             </Stack>
 
             <Typography color="text.secondary" sx={{ mt: 1, ml: 0.6}}>
-              Software Engineering MEng Student
+              {profile.about.role}
             </Typography>
 
             <Typography color="text.secondary" sx={{ml: 0.6}}>
-              GPA, 3.9 / 4.0
+              {profile.about.gpa}
             </Typography>
 
             <Typography color="text.secondary" sx={{ml: 0.6}}>
-              Expected Graduation, May 2027
+              {profile.about.graduation}
             </Typography>
           </Box>
         </Stack>
@@ -73,42 +75,41 @@ function AboutCard() {
           >
             <WorkIcon sx={{ color: "primary.main" }} />
             <Typography variant="h5" sx={{ fontWeight: 600 }}>
-              Technical Experience
+              {uiText.about.experienceHeading}
             </Typography>
           </Stack>
 
-          <Box
-            sx={{
-              p: 2,
-              borderRadius: 3,
-              backgroundColor: "white",
-              border: "1px solid",
-              borderColor: "divider",
-            }}
-          >
-            <Typography variant="h6">
-              Data Assistant, Campus AI Pilot Program
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Apr 2023 - Jul 2023
-            </Typography>
-            <Stack direction={"row"} sx={{ alignItems: "center" }}>
-              <LocationOnIcon sx={{ fontSize: 16 }} />
-              <Typography variant="body2" color="text.secondary">
-                Nanjing University of Posts and Telecommunications, China
-              </Typography>
-            </Stack>
-
-            <Typography
-              variant="body1"
-              color="text.secondary"
-              sx={{ mt: 1.5, lineHeight: 1.5 }}
+          {profile.about.experience.map((experience) => (
+            <Box
+              key={`${experience.title}-${experience.period}`}
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                backgroundColor: "white",
+                border: "1px solid",
+                borderColor: "divider",
+              }}
             >
-              Reviewed model outputs, corrected labels, automated validation
-              checks with Python, and documented reproducible issues for
-              follow-up analysis.
-            </Typography>
-          </Box>
+              <Typography variant="h6">{experience.title}</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {experience.period}
+              </Typography>
+              <Stack direction={"row"} sx={{ alignItems: "center" }}>
+                <LocationOnIcon sx={{ fontSize: 16 }} />
+                <Typography variant="body2" color="text.secondary">
+                  {experience.location}
+                </Typography>
+              </Stack>
+
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                sx={{ mt: 1.5, lineHeight: 1.5 }}
+              >
+                {experience.description}
+              </Typography>
+            </Box>
+          ))}
         </Box>
 
         {/* Education */}
@@ -120,58 +121,43 @@ function AboutCard() {
           >
             <SchoolIcon sx={{ color: "primary.main" }} />
             <Typography variant="h5" sx={{ fontWeight: 600 }}>
-              Education
+              {uiText.about.educationHeading}
             </Typography>
           </Stack>
 
           <Stack spacing={2}>
-            <Box
-              sx={{
-                p: 2,
-                borderRadius: 3,
-                backgroundColor: "white",
-                border: "1px solid",
-                borderColor: "divider",
-              }}
-            >
-              <Typography variant="h6">
-                M.Eng. in Electrical and Computer Engineering
-              </Typography>
+            {profile.about.education.map((education) => (
+              <Box
+                key={`${education.degree}-${education.period}`}
+                sx={{
+                  p: 2,
+                  borderRadius: 3,
+                  backgroundColor: "white",
+                  border: "1px solid",
+                  borderColor: "divider",
+                }}
+              >
+                <Typography variant="h6">{education.degree}</Typography>
 
-              <Typography variant="body2" color="text.secondary">
-                Sep 2025 - Present
-              </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {education.period}
+                </Typography>
 
-              <Typography variant="body2" color="text.secondary">
-                University of Alberta, Edmonton, AB, Canada
-              </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {education.institution}
+                </Typography>
 
-              <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-                Specialization in Software Engineering and Intelligent Systems
-              </Typography>
-            </Box>
-
-            <Box
-              sx={{
-                p: 2,
-                borderRadius: 3,
-                backgroundColor: "white",
-                border: "1px solid",
-                borderColor: "divider",
-              }}
-            >
-              <Typography variant="h6">
-                B.Eng. in Internet of Things Engineering
-              </Typography>
-
-              <Typography variant="body2" color="text.secondary">
-                Sep 2019 - Jun 2023
-              </Typography>
-
-              <Typography variant="body2" color="text.secondary">
-                Nanjing University of Posts and Telecommunications, China
-              </Typography>
-            </Box>
+                {education.detail && (
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    sx={{ mt: 1 }}
+                  >
+                    {education.detail}
+                  </Typography>
+                )}
+              </Box>
+            ))}
           </Stack>
         </Box>
       </Stack>

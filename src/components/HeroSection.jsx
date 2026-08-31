@@ -20,6 +20,8 @@ import ProjectsCard from "./ProjectsCard";
 import ContactCard from "./ContactCard";
 import CardFlipTransition from "./CardFlipTransition";
 import ParticleFlowGroup from "./ParticleFlowGroup";
+import profile from "../content/profile";
+import uiText from "../content/uiText";
 
 const panelComponents = {
   about: AboutCard,
@@ -94,7 +96,7 @@ function HeroSection({ activePanel, setActivePanel }) {
                 letterSpacing: 1.5,
               }}
             >
-              Software Engineering Portfolio · Work in Progress
+              {uiText.hero.eyebrow}
             </Typography>
 
             <Typography
@@ -110,7 +112,7 @@ function HeroSection({ activePanel, setActivePanel }) {
                 },
               }}
             >
-              Hi, I’m Qihang Feng.
+              {profile.hero.greeting}
             </Typography>
 
             <Typography
@@ -121,8 +123,7 @@ function HeroSection({ activePanel, setActivePanel }) {
                 lineHeight: 1.5,
               }}
             >
-              MEng student building full stack applications and machine learning
-              projects with React, FastAPI, PyTorch, and SQL.
+              {profile.hero.headline}
             </Typography>
 
             <Typography
@@ -133,9 +134,7 @@ function HeroSection({ activePanel, setActivePanel }) {
                 lineHeight: 1.8,
               }}
             >
-              I focus on practical software development, reproducible machine
-              learning workflows, data structures, and technical content that
-              turns complex ideas into clear materials.
+              {profile.hero.summary}
             </Typography>
 
             <Stack
@@ -156,13 +155,13 @@ function HeroSection({ activePanel, setActivePanel }) {
                   width: { xs: "100%", sm: "fit-content" },
                 }}
               >
-                {hasPanelInLayout ? "Next" : "Start"}
+                {hasPanelInLayout ? uiText.hero.next : uiText.hero.start}
               </Button>
 
               <Button
                 variant="outlined"
                 size="large"
-                href={`${import.meta.env.BASE_URL}Qihang_Feng_Resume.pdf`}
+                href={`${import.meta.env.BASE_URL}${profile.resumeFile}`}
                 download
                 startIcon={<DownloadIcon />}
                 sx={{
@@ -182,7 +181,7 @@ function HeroSection({ activePanel, setActivePanel }) {
                   },
                 }}
               >
-                Download Resume
+                {uiText.hero.downloadResume}
               </Button>
             </Stack>
 
@@ -195,30 +194,30 @@ function HeroSection({ activePanel, setActivePanel }) {
               }}
             >
               <IconButton
-                href="https://www.linkedin.com/in/qihang-feng-48bb72395/"
+                href={profile.socialLinks.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="LinkedIn"
+                aria-label={uiText.social.linkedin}
                 sx={{ color: "#0A66C2" }}
               >
                 <LinkedInIcon fontSize="large" />
               </IconButton>
 
               <IconButton
-                href="https://github.com/QihangFeng"
+                href={profile.socialLinks.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="GitHub"
+                aria-label={uiText.social.github}
                 sx={{ color: "#181717" }}
               >
                 <GitHubIcon fontSize="large" />
               </IconButton>
 
               <IconButton
-                href="https://www.youtube.com/@BeaverExplorers"
+                href={profile.socialLinks.youtube}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="YouTube"
+                aria-label={uiText.social.youtube}
                 sx={{ color: "#FF0000" }}
               >
                 <YouTubeIcon fontSize="large" />

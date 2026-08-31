@@ -11,6 +11,8 @@ import {
 
 import EmailIcon from "@mui/icons-material/Email";
 import LiquidGlassCard from "./LiquidGlassCard";
+import profile from "../content/profile";
+import uiText from "../content/uiText";
 
 function ContactCard() {
   const formRef = useRef(null);
@@ -19,22 +21,22 @@ function ContactCard() {
 
   const contactLinks = [
     {
-      label: "Email",
-      value: "q7feng@gmail.com",
-      href: "mailto:q7feng@gmail.com",
+      label: uiText.contact.emailLabel,
+      value: profile.contact.email,
+      href: `mailto:${profile.contact.email}`,
       icon: <EmailIcon />,
     },
   ];
 
   function handleSubmit() {
-    setStatus("Sending...");
+    setStatus(uiText.contact.sending);
     setIsSubmitting(true);
   }
 
   function handleIframeLoad() {
     if (!isSubmitting) return;
 
-    setStatus("Message sent successfully.");
+    setStatus(uiText.contact.sentSuccessfully);
     setIsSubmitting(false);
     formRef.current?.reset();
   }
@@ -54,12 +56,11 @@ function ContactCard() {
       <Stack spacing={3}>
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 600 }}>
-            Contact
+            {uiText.contact.heading}
           </Typography>
 
           <Typography color="text.secondary" sx={{ mt: 1, lineHeight: 1.5 }}>
-            I am open to software development, full stack projects, machine
-            learning research, and technical collaboration opportunities.
+            {profile.contact.introduction}
           </Typography>
         </Box>
 
@@ -102,7 +103,7 @@ function ContactCard() {
 
         <iframe
           name="web3forms-hidden-frame"
-          title="web3forms-hidden-frame"
+          title={uiText.contact.hiddenFrameTitle}
           style={{ display: "none" }}
           onLoad={handleIframeLoad}
         />
@@ -116,7 +117,7 @@ function ContactCard() {
           onSubmit={handleSubmit}
         >
           <Typography variant="h6" fontWeight={800} sx={{ mb: 2 }}>
-            Quick Message
+            {uiText.contact.quickMessageHeading}
           </Typography>
 
           <input
@@ -128,17 +129,22 @@ function ContactCard() {
           <input
             type="hidden"
             name="subject"
-            value="New message from Qihang Feng Portfolio"
+            value={profile.contact.formSubject}
           />
 
           <input type="checkbox" name="botcheck" style={{ display: "none" }} />
 
           <Stack spacing={2}>
-            <TextField name="name" label="Your name" fullWidth size="small" />
+            <TextField
+              name="name"
+              label={uiText.contact.nameLabel}
+              fullWidth
+              size="small"
+            />
 
             <TextField
               name="email"
-              label="Your email"
+              label={uiText.contact.emailFieldLabel}
               type="email"
               fullWidth
               size="small"
@@ -147,7 +153,7 @@ function ContactCard() {
 
             <TextField
               name="message"
-              label="Message"
+              label={uiText.contact.messageLabel}
               fullWidth
               multiline
               minRows={4}
@@ -166,14 +172,16 @@ function ContactCard() {
                   px: 3,
                 }}
               >
-                {isSubmitting ? "Sending..." : "Send Message"}
+                {isSubmitting
+                  ? uiText.contact.sending
+                  : uiText.contact.sendMessage}
               </Button>
 
               {status && (
                 <Typography
                   variant="body2"
                   sx={{
-                    color: status.includes("successfully")
+                    color: status === uiText.contact.sentSuccessfully
                       ? "success.main"
                       : "text.secondary",
                     fontWeight: 600,
@@ -184,7 +192,7 @@ function ContactCard() {
               )}
             </Stack>
             <Typography variant="body2" color="text.secondary">
-              This form sends your message directly to my email.
+              {uiText.contact.helperText}
             </Typography>
           </Stack>
         </Box>

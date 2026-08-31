@@ -15,47 +15,17 @@ import ImageSearchIcon from "@mui/icons-material/ImageSearch";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import WebIcon from "@mui/icons-material/Web";
 import LiquidGlassCard from "./LiquidGlassCard";
+import profile from "../content/profile";
+import uiText from "../content/uiText";
+
+const projectIcons = {
+  portfolio: <WebIcon />,
+  lime: <PsychologyIcon />,
+  objectPlacement: <ImageSearchIcon />,
+  balancedTrees: <AccountTreeIcon />,
+};
 
 function ProjectsCard() {
-  const projects = [
-    {
-      title: "Personal Portfolio Website",
-      type: "Frontend Development",
-      icon: <WebIcon />,
-      description:
-        "Built and deployed an interactive portfolio website with React, Vite, and Material UI, featuring animated card navigation, responsive layout, and a working contact form.",
-      tech: ["React", "Vite", "Material UI", "GitHub Pages", "Web3Forms"],
-      link: "https://github.com/QihangFeng/portfolio",
-    },
-    {
-      title: "Reliable LIME under Query Budget Constraints",
-      type: "Explainable AI",
-      icon: <PsychologyIcon />,
-      description:
-        "Built a budget sweep pipeline for LIME image explanations and designed a coarse to fine budget allocation strategy to improve faithfulness under low query budgets.",
-      tech: ["Python", "LIME", "XAI", "Evaluation", "scikit-learn"],
-      link: "https://github.com/QihangFeng/Reliable-LIME-under-Query-Budget-Constraints",
-    },
-    {
-      title: "Object Placement Localization in Street Scenes",
-      type: "Computer Vision",
-      icon: <ImageSearchIcon />,
-      description:
-        "Built a text guided computer vision pipeline for object placement in street scenes, improving validation localization performance with candidate generation, neural ranking, and ablation studies.",
-      tech: ["Python", "PyTorch", "Computer Vision", "Cityscapes"],
-      link: "https://github.com/QihangFeng/Object-Placement-Localization-in-Street-Scenes",
-    },
-    {
-      title: "Rust Balanced Trees",
-      type: "Data Structures",
-      icon: <AccountTreeIcon />,
-      description:
-        "Implemented AVL Tree and Red Black Tree in Rust with reusable generic abstractions, shared rotation logic, an interactive CLI, and Criterion benchmarks.",
-      tech: ["Rust", "AVL Tree", "Red Black Tree", "Benchmarking"],
-      link: "https://github.com/QihangFeng/Rust-Balanced-Trees",
-    },
-  ];
-
   return (
     <LiquidGlassCard
       sx={{
@@ -71,19 +41,18 @@ function ProjectsCard() {
       <Stack spacing={3}>
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 600 }}>
-            Projects
+            {uiText.projects.heading}
           </Typography>
 
           <Typography color="text.secondary" sx={{ mt: 1, lineHeight: 1.5 }}>
-            Selected projects covering frontend development, explainable AI,
-            computer vision, and data structure implementation.
+            {uiText.projects.introduction}
           </Typography>
         </Box>
 
         <Divider />
 
         <Stack spacing={2.5}>
-          {projects.map((project) => (
+          {profile.projects.map((project) => (
             <Paper
               key={project.title}
               elevation={0}
@@ -109,7 +78,7 @@ function ProjectsCard() {
                       alignItems: "center",
                     }}
                   >
-                    {project.icon}
+                    {projectIcons[project.id]}
                   </Box>
 
                   <Box>
@@ -155,7 +124,7 @@ function ProjectsCard() {
                     px: 0,
                   }}
                 >
-                  View on GitHub
+                  {uiText.projects.viewOnGitHub}
                 </Button>
               </Stack>
             </Paper>

@@ -7,41 +7,19 @@ import TerminalIcon from "@mui/icons-material/Terminal";
 import BuildIcon from "@mui/icons-material/Build";
 import WebIcon from "@mui/icons-material/Web";
 import LiquidGlassCard from "./LiquidGlassCard";
+import profile from "../content/profile";
+import uiText from "../content/uiText";
+
+const skillIcons = {
+  frontend: <WebIcon />,
+  backend: <DnsIcon />,
+  databases: <StorageIcon />,
+  machineLearning: <PsychologyIcon />,
+  foundations: <TerminalIcon />,
+  tools: <BuildIcon />,
+};
 
 function SkillsCard() {
-  const skillGroups = [
-    {
-      title: "Frontend Development",
-      icon: <WebIcon />,
-      skills: ["React", "JavaScript", "Vite", "Material UI"],
-    },
-    {
-      title: "Backend Development",
-      icon: <DnsIcon />,
-      skills: ["Node.js", "Express", "REST APIs", "FastAPI"],
-    },
-    {
-      title: "Databases",
-      icon: <StorageIcon />,
-      skills: ["SQL", "MySQL", "PostgreSQL"],
-    },
-    {
-      title: "Machine Learning and Data",
-      icon: <PsychologyIcon />,
-      skills: ["Python", "PyTorch", "OpenCV", "scikit-learn", "R"],
-    },
-    {
-      title: "Programming Foundations",
-      icon: <TerminalIcon />,
-      skills: ["Rust", "C", "C++", "Java"],
-    },
-    {
-      title: "Tools and Workflow",
-      icon: <BuildIcon />,
-      skills: ["Git", "GitHub", "VS Code", "JupyterLab"],
-    },
-  ];
-
   return (
     <LiquidGlassCard
       sx={{
@@ -57,19 +35,18 @@ function SkillsCard() {
       <Stack spacing={3}>
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 600 }}>
-            Technical Skills
+            {uiText.skills.heading}
           </Typography>
 
           <Typography color="text.secondary" sx={{ mt: 1, lineHeight: 1.5 }}>
-            A practical technical stack for building full stack applications,
-            machine learning projects, and reproducible software workflows.
+            {uiText.skills.introduction}
           </Typography>
         </Box>
 
         <Divider />
 
         <Stack spacing={2.5}>
-          {skillGroups.map((group) => (
+          {profile.skillGroups.map((group) => (
             <Box
               key={group.title}
               sx={{
@@ -93,7 +70,7 @@ function SkillsCard() {
                     alignItems: "center",
                   }}
                 >
-                  {group.icon}
+                  {skillIcons[group.id]}
                 </Box>
 
                 <Typography variant="h6">{group.title}</Typography>

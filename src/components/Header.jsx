@@ -1,16 +1,12 @@
 import { AppBar, Box, Button, Container, Toolbar } from "@mui/material";
+import uiText from "../content/uiText";
 
 function Header({ activePanel, setActivePanel }) {
-  const navItems = [
-    { label: "Home", value: "home" },
-    { label: "About", value: "about" },
-    { label: "Skills", value: "skills" },
-    { label: "Projects", value: "projects" },
-    { label: "Contact", value: "contact" },
-  ];
   const buttonWidth = 96;
   const gap = 24;
-  const activeIndex = navItems.findIndex((item) => item.value === activePanel);
+  const activeIndex = uiText.navigation.findIndex(
+    (item) => item.value === activePanel,
+  );
   return (
     <AppBar
       position="sticky"
@@ -44,7 +40,7 @@ function Header({ activePanel, setActivePanel }) {
                 zIndex: 0,
               }}
             />
-            {navItems.map((item) => {
+            {uiText.navigation.map((item) => {
               return (
                 <Button
                   key={item.value}
