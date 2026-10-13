@@ -57,7 +57,7 @@ const profile = {
     {
       id: "frontend",
       title: "Frontend",
-      skills: ["React", "JavaScript", "Vite", "Material UI"],
+      skills: ["React", "JavaScript", "TypeScript", "Vite", "Material UI"],
     },
     {
       id: "machineLearning",
@@ -72,7 +72,7 @@ const profile = {
     {
       id: "foundations",
       title: "Languages",
-      skills: ["Python", "JavaScript", "SQL", "C++", "Rust"],
+      skills: ["Python", "JavaScript", "TypeScript", "SQL", "C++", "Rust"],
     },
     {
       id: "tools",
