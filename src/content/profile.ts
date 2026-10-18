@@ -1,4 +1,6 @@
-const profile = {
+import type { PortfolioProfile } from "./types";
+
+const profile: PortfolioProfile = {
   name: "Qihang Feng",
   siteTitle: "Qihang Feng Portfolio",
   initials: "QF",

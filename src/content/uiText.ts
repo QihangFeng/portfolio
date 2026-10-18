@@ -1,3 +1,10 @@
+import type { PanelId } from "../types/navigation";
+
+interface NavigationItem {
+  label: string;
+  value: PanelId;
+}
+
 const uiText = {
   navigation: [
     { label: "Home", value: "home" },
@@ -5,7 +12,7 @@ const uiText = {
     { label: "Skills", value: "skills" },
     { label: "Projects", value: "projects" },
     { label: "Contact", value: "contact" },
-  ],
+  ] satisfies NavigationItem[],
   hero: {
     eyebrow: "Software Engineering Portfolio · Work in Progress",
     start: "Start",

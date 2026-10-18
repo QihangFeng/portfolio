@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   Box,
   Button,
@@ -17,13 +18,14 @@ import WebIcon from "@mui/icons-material/Web";
 import LiquidGlassCard from "./LiquidGlassCard";
 import profile from "../content/profile";
 import uiText from "../content/uiText";
+import type { ProjectId } from "../content/types";
 
 const projectIcons = {
   portfolio: <WebIcon />,
   lime: <PsychologyIcon />,
   objectPlacement: <ImageSearchIcon />,
   balancedTrees: <AccountTreeIcon />,
-};
+} satisfies Record<ProjectId, ReactNode>;
 
 function ProjectsCard() {
   return (
@@ -70,7 +72,7 @@ function ProjectsCard() {
               }}
             >
               <Stack spacing={1.5}>
-                <Stack direction="row" spacing={1.5} alignItems="center">
+                <Stack direction="row" spacing={1.5}>
                   <Box
                     sx={{
                       color: "primary.main",
@@ -82,7 +84,7 @@ function ProjectsCard() {
                   </Box>
 
                   <Box>
-                    <Typography variant="h6" fontWeight={800}>
+                    <Typography variant="h6">
                       {project.title}
                     </Typography>
 
@@ -96,7 +98,7 @@ function ProjectsCard() {
                   {project.description}
                 </Typography>
 
-                <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                <Stack direction="row" spacing={1} useFlexGap>
                   {project.tech.map((item) => (
                     <Chip
                       key={item}

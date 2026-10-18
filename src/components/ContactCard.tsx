@@ -15,7 +15,7 @@ import profile from "../content/profile";
 import uiText from "../content/uiText";
 
 function ContactCard() {
-  const formRef = useRef(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
   const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -90,7 +90,7 @@ function ContactCard() {
               }}
             >
               <Box sx={{ textAlign: "left" }}>
-                <Typography fontWeight={700}>{item.label}</Typography>
+                <Typography>{item.label}</Typography>
                 <Typography variant="body2" color="text.secondary">
                   {item.value}
                 </Typography>
@@ -116,7 +116,7 @@ function ContactCard() {
           target="web3forms-hidden-frame"
           onSubmit={handleSubmit}
         >
-          <Typography variant="h6" fontWeight={800} sx={{ mb: 2 }}>
+          <Typography variant="h6" sx={{ mb: 2 }}>
             {uiText.contact.quickMessageHeading}
           </Typography>
 

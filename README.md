@@ -21,9 +21,18 @@ https://qfeng.beaverexp.com/
 - React
 - Vite
 - Material UI
-- JavaScript
+- JavaScript / TypeScript
 - GitHub Pages
 - GitHub Actions
+
+## Development
+
+Install the locked dependencies with `npm ci`, then run `npm run dev`.
+
+- `npm run lint` checks JavaScript and TypeScript code.
+- `npm run typecheck` checks types without emitting JavaScript.
+- `npm run build` runs type checking and creates the production build.
+- `npm run preview` serves the production build locally.
 
 ## Planned features
 

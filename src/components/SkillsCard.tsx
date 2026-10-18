@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Box, Chip, Divider, Stack, Typography } from "@mui/material";
 
 import StorageIcon from "@mui/icons-material/Storage";
@@ -9,6 +10,7 @@ import WebIcon from "@mui/icons-material/Web";
 import LiquidGlassCard from "./LiquidGlassCard";
 import profile from "../content/profile";
 import uiText from "../content/uiText";
+import type { SkillGroupId } from "../content/types";
 
 const skillIcons = {
   frontend: <WebIcon />,
@@ -17,7 +19,7 @@ const skillIcons = {
   machineLearning: <PsychologyIcon />,
   foundations: <TerminalIcon />,
   tools: <BuildIcon />,
-};
+} satisfies Record<SkillGroupId, ReactNode>;
 
 function SkillsCard() {
   return (
@@ -70,7 +72,7 @@ function SkillsCard() {
                 },
               }}
             >
-              <Stack direction="row" spacing={1.5} alignItems="center">
+              <Stack direction="row" spacing={1.5}>
                 <Box
                   sx={{
                     color: "primary.main",
