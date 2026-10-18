@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ComponentType } from "react";
 import {
   Box,
   Button,
@@ -22,20 +22,21 @@ import CardFlipTransition from "./CardFlipTransition";
 import ParticleFlowGroup from "./ParticleFlowGroup";
 import profile from "../content/profile";
 import uiText from "../content/uiText";
+import type { CardPanelId, NavigationProps } from "../types/navigation";
 
 const panelComponents = {
   about: AboutCard,
   skills: SkillsCard,
   projects: ProjectsCard,
   contact: ContactCard,
-};
+} satisfies Record<CardPanelId, ComponentType>;
 
-function renderPanel(panel) {
+function renderPanel(panel: CardPanelId) {
   const Panel = panelComponents[panel];
   return Panel ? <Panel /> : null;
 }
 
-function HeroSection({ activePanel, setActivePanel }) {
+function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
   const hasActivePanel = activePanel !== "home";
   const [hasPanelInLayout, setHasPanelInLayout] = useState(hasActivePanel);
 

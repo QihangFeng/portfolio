@@ -1,13 +1,42 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { ReactNode, TransitionEvent } from "react";
 import { Box, useMediaQuery } from "@mui/material";
+import type { CardPanelId, PanelId } from "../types/navigation";
+
+interface CardFlipTransitionProps {
+  activePanel: PanelId;
+  onPresenceChange: (isPresent: boolean) => void;
+  renderPanel: (panel: CardPanelId) => ReactNode;
+}
+
+interface DetachedLayout {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+type FlipDirection = -1 | 1;
+type TransitionKind = "flip" | "slide-enter" | "slide-exit";
+type RestPhase = "entering" | "flip-in";
+type TransitionPhase =
+  | "idle"
+  | "preparing-enter"
+  | "exiting"
+  | "flip-out"
+  | "preparing-flip-in"
+  | RestPhase;
 
 const HALF_FLIP_DURATION = 220;
 const SLIDE_DURATION = 480;
 const SLIDE_ENTER_EASING = "cubic-bezier(0.25, 0.46, 0.45, 0.94)";
 const SLIDE_EXIT_EASING = "cubic-bezier(0.55, 0.06, 0.68, 0.19)";
-const PANEL_ORDER = ["about", "skills", "projects", "contact"];
+const PANEL_ORDER: readonly CardPanelId[] = ["about", "skills", "projects", "contact"];
 
-function getFlipDirection(currentPanel, nextPanel) {
+function getFlipDirection(
+  currentPanel: CardPanelId,
+  nextPanel: CardPanelId,
+): FlipDirection {
   return PANEL_ORDER.indexOf(nextPanel) > PANEL_ORDER.indexOf(currentPanel)
     ? 1
     : -1;
@@ -17,26 +46,26 @@ function CardFlipTransition({
   activePanel,
   onPresenceChange,
   renderPanel,
-}) {
+}: CardFlipTransitionProps) {
   const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const requestedPanel = activePanel === "home" ? null : activePanel;
-  const [displayedPanel, setDisplayedPanel] = useState(requestedPanel);
+  const [displayedPanel, setDisplayedPanel] = useState<CardPanelId | null>(requestedPanel);
   const [rotation, setRotation] = useState(0);
   const [slideOffset, setSlideOffset] = useState("0px");
   const [opacity, setOpacity] = useState(1);
-  const [transitionKind, setTransitionKind] = useState("flip");
+  const [transitionKind, setTransitionKind] = useState<TransitionKind>("flip");
   const [transitionEnabled, setTransitionEnabled] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [detachedLayout, setDetachedLayout] = useState(null);
+  const [detachedLayout, setDetachedLayout] = useState<DetachedLayout | null>(null);
 
-  const containerRef = useRef(null);
-  const displayedPanelRef = useRef(requestedPanel);
-  const requestedPanelRef = useRef(requestedPanel);
-  const phaseRef = useRef("idle");
-  const flipDirectionRef = useRef(1);
-  const frameRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const displayedPanelRef = useRef<CardPanelId | null>(requestedPanel);
+  const requestedPanelRef = useRef<CardPanelId | null>(requestedPanel);
+  const phaseRef = useRef<TransitionPhase>("idle");
+  const flipDirectionRef = useRef<FlipDirection>(1);
+  const frameRef = useRef<number | null>(null);
 
-  const scheduleToRest = useCallback((phase) => {
+  const scheduleToRest = useCallback((phase: RestPhase) => {
     frameRef.current = requestAnimationFrame(() => {
       frameRef.current = requestAnimationFrame(() => {
         phaseRef.current = phase;
@@ -141,7 +170,7 @@ function CardFlipTransition({
     };
   }, []);
 
-  function handleTransitionEnd(event) {
+  function handleTransitionEnd(event: TransitionEvent<HTMLDivElement>) {
     if (event.target !== event.currentTarget || event.propertyName !== "transform") {
       return;
     }

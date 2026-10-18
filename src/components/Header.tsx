@@ -1,7 +1,8 @@
 import { AppBar, Box, Button, Container, Toolbar } from "@mui/material";
 import uiText from "../content/uiText";
+import type { NavigationProps } from "../types/navigation";
 
-function Header({ activePanel, setActivePanel }) {
+function Header({ activePanel, setActivePanel }: NavigationProps) {
   const buttonWidth = 96;
   const gap = 24;
   const activeIndex = uiText.navigation.findIndex(

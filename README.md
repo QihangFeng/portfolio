@@ -1,6 +1,6 @@
 # Portfolio
 
-A clean and professional portfolio template built with React, Vite, and Material UI. It helps developers showcase their background, technical skills, selected projects, resume, and contact information in an interactive layout.
+A clean and professional portfolio template built with React, TypeScript, Vite, and Material UI. It helps developers showcase their background, technical skills, selected projects, resume, and contact information in an interactive layout.
 
 ## Live Demo
 
@@ -21,7 +21,7 @@ https://qfeng.beaverexp.com/
 - React
 - Vite
 - Material UI
-- JavaScript / TypeScript
+- TypeScript
 - GitHub Pages
 - GitHub Actions
 

@@ -1,12 +1,50 @@
 import { useLayoutEffect, useRef } from "react";
 import { Box, useMediaQuery } from "@mui/material";
+import type { BoxProps } from "@mui/material";
+
+interface Particle {
+  x: number;
+  y: number;
+  normalizedX: number;
+  normalizedY: number;
+  red: number;
+  green: number;
+  blue: number;
+  alpha: number;
+  radius: number;
+}
+
+interface FlowParticle extends Particle {
+  delay: number;
+  curve: number;
+}
+
+interface ElementSnapshot {
+  rect: DOMRect;
+  image: HTMLCanvasElement;
+  particles: Particle[];
+  sourceElement: HTMLElement;
+}
+
+interface FlowCanvas {
+  canvas: HTMLCanvasElement;
+  context: CanvasRenderingContext2D;
+}
+
+interface ParticleFlowGroupProps extends BoxProps {
+  transitionKey: boolean;
+  direction: -1 | 1;
+  maxParticles?: number;
+}
+
+type ElementRenderer = typeof import("html2canvas")["default"];
 
 const DISSOLVE_DURATION = 100;
 const FLOW_DURATION = 400;
 const REASSEMBLE_DURATION = 150;
 const PARTICLE_DURATION =
   DISSOLVE_DURATION + FLOW_DURATION + REASSEMBLE_DURATION;
-let rendererPromise;
+let rendererPromise: Promise<ElementRenderer> | undefined;
 
 function loadElementRenderer() {
   rendererPromise ??= import("html2canvas").then(
@@ -15,16 +53,19 @@ function loadElementRenderer() {
   return rendererPromise;
 }
 
-function seededValue(seed) {
+function seededValue(seed: number) {
   const value = Math.sin(seed * 12.9898) * 43758.5453;
   return value - Math.floor(value);
 }
 
-async function captureElementSnapshot(root, maxParticles) {
+async function captureElementSnapshot(
+  root: HTMLElement,
+  maxParticles: number,
+): Promise<ElementSnapshot> {
   const marker = `particle-flow-${performance.now()}-${Math.random()}`;
   const html2canvas = await loadElementRenderer();
   const rootRect = root.getBoundingClientRect();
-  const sourceElement = root.cloneNode(true);
+  const sourceElement = root.cloneNode(true) as HTMLElement;
 
   sourceElement.style.opacity = "1";
   sourceElement.style.visibility = "visible";
@@ -38,7 +79,7 @@ async function captureElementSnapshot(root, maxParticles) {
       scale: 1,
       useCORS: true,
       onclone: (clonedDocument) => {
-        const clonedRoot = clonedDocument.querySelector(
+        const clonedRoot = clonedDocument.querySelector<HTMLElement>(
           `[data-particle-flow-capture="${marker}"]`,
         );
 
@@ -52,13 +93,16 @@ async function captureElementSnapshot(root, maxParticles) {
     const context = renderedElement.getContext("2d", {
       willReadFrequently: true,
     });
+    if (!context) {
+      throw new Error("Could not create the particle snapshot canvas context.");
+    }
     const width = renderedElement.width;
     const height = renderedElement.height;
     const pixels = context.getImageData(0, 0, width, height).data;
     const scaleX = rootRect.width / Math.max(width, 1);
     const scaleY = rootRect.height / Math.max(height, 1);
     const sampleStep = rootRect.width >= 560 ? 3 : 2;
-    const particles = [];
+    const particles: Particle[] = [];
 
     for (let y = 0; y < height; y += sampleStep) {
       for (let x = 0; x < width; x += sampleStep) {
@@ -107,10 +151,10 @@ async function captureElementSnapshot(root, maxParticles) {
   }
 }
 
-function createSourceOverlay(snapshot) {
+function createSourceOverlay(snapshot: ElementSnapshot): HTMLElement | null {
   if (!snapshot.sourceElement) return null;
 
-  const overlay = snapshot.sourceElement.cloneNode(true);
+  const overlay = snapshot.sourceElement.cloneNode(true) as HTMLElement;
 
   overlay.setAttribute("aria-hidden", "true");
   Object.assign(overlay.style, {
@@ -132,10 +176,13 @@ function createSourceOverlay(snapshot) {
   return overlay;
 }
 
-function createFlowCanvas() {
+function createFlowCanvas(): FlowCanvas {
   const canvas = document.createElement("canvas");
   const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
   const context = canvas.getContext("2d");
+  if (!context) {
+    throw new Error("Could not create the particle flow canvas context.");
+  }
 
   canvas.width = Math.ceil(window.innerWidth * pixelRatio);
   canvas.height = Math.ceil(window.innerHeight * pixelRatio);
@@ -155,7 +202,7 @@ function createFlowCanvas() {
   return { canvas, context };
 }
 
-function easeInOutCubic(progress) {
+function easeInOutCubic(progress: number) {
   return progress < 0.5
     ? 4 * progress ** 3
     : 1 - (-2 * progress + 2) ** 3 / 2;
@@ -168,22 +215,19 @@ function ParticleFlowGroup({
   maxParticles = 6200,
   sx,
   ...boxProps
-}) {
+}: ParticleFlowGroupProps) {
   const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
-  const rootRef = useRef(null);
-  const snapshotRef = useRef(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const snapshotRef = useRef<ElementSnapshot | null>(null);
   const previousKeyRef = useRef(transitionKey);
 
   useLayoutEffect(() => {
+    if (!rootRef.current) return undefined;
     const root = rootRef.current;
-    if (!root) return undefined;
 
     let active = true;
-    let animationFrame;
-    let flowCanvas;
-    let sourceOverlay;
-    let layoutContainer;
-    let originalLayoutTransitionProperty;
+    let animationFrame: number | undefined;
+    let sourceOverlay: HTMLElement | null;
 
     if (
       previousKeyRef.current === transitionKey ||
@@ -206,7 +250,7 @@ function ParticleFlowGroup({
     previousKeyRef.current = transitionKey;
 
     const previousSnapshot = snapshotRef.current;
-    const particles = previousSnapshot.particles.map((particle, index) => {
+    const particles: FlowParticle[] = previousSnapshot.particles.map((particle, index) => {
       const seed = particle.x * 0.37 + particle.y * 0.61 + index * 0.19;
 
       return {
@@ -219,14 +263,14 @@ function ParticleFlowGroup({
     const { canvas, context } = createFlowCanvas();
     const startTime = performance.now();
     const originalTransitionProperty = root.style.transitionProperty;
-    let targetSnapshot = null;
+    let targetSnapshot: ElementSnapshot | null = null;
     let targetCaptureStarted = false;
-    let targetWaitStarted = null;
+    let targetWaitStarted: number | null = null;
     let accumulatedTargetWait = 0;
 
-    flowCanvas = canvas;
-    layoutContainer = root.parentElement;
-    originalLayoutTransitionProperty =
+    const flowCanvas = canvas;
+    const layoutContainer = root.parentElement;
+    const originalLayoutTransitionProperty =
       layoutContainer?.style.transitionProperty ?? "";
     root.style.transitionProperty = "none";
     if (layoutContainer) {
@@ -246,7 +290,7 @@ function ParticleFlowGroup({
       });
     }
 
-    function drawFrame(now) {
+    function drawFrame(now: number) {
       let elapsed = Math.max(
         0,
         now - startTime - accumulatedTargetWait,
@@ -424,7 +468,9 @@ function ParticleFlowGroup({
 
     return () => {
       active = false;
-      cancelAnimationFrame(animationFrame);
+      if (animationFrame !== undefined) {
+        cancelAnimationFrame(animationFrame);
+      }
       root.style.opacity = "";
       root.style.transitionProperty = originalTransitionProperty;
       if (layoutContainer) {

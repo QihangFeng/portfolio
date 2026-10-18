@@ -1,7 +1,7 @@
 import { useId } from "react";
-import { Box, Paper } from "@mui/material";
+import { Box, Paper, type PaperProps } from "@mui/material";
 
-function LiquidGlassCard({ children, sx, ...paperProps }) {
+function LiquidGlassCard({ children, sx = [], ...paperProps }: PaperProps) {
   const filterId = `liquid-glass-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
   return (
@@ -97,7 +97,7 @@ function LiquidGlassCard({ children, sx, ...paperProps }) {
         {...paperProps}
         elevation={0}
         sx={[
-          sx,
+          ...(Array.isArray(sx) ? sx : [sx]),
           {
             position: "relative",
             zIndex: 3,

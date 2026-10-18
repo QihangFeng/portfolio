@@ -4,9 +4,10 @@ import { Box } from "@mui/material";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import HeroSection from "./components/HeroSection";
+import type { PanelId } from "./types/navigation";
 
 function App() {
-  const [activePanel, setActivePanel] = useState("home");
+  const [activePanel, setActivePanel] = useState<PanelId>("home");
 
   return (
     <Box
