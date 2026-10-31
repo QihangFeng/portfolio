@@ -7,9 +7,10 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 import "./index.css";
-import profile from "./content/profile";
+import { contentByLanguage } from "./content";
+import LanguageProvider from "./content/LanguageProvider";
 
-document.title = profile.siteTitle;
+document.title = contentByLanguage.en.profile.siteTitle;
 
 const rootElement = document.getElementById('root');
 
@@ -19,6 +20,8 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <LanguageProvider>
+      <App />
+    </LanguageProvider>
   </StrictMode>,
 )

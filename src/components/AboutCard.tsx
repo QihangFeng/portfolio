@@ -4,10 +4,10 @@ import SchoolIcon from "@mui/icons-material/School";
 import WorkIcon from "@mui/icons-material/Work";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import LiquidGlassCard from "./LiquidGlassCard";
-import profile from "../content/profile";
-import uiText from "../content/uiText";
+import { useContent } from "../content/useContent";
 
 function AboutCard() {
+  const { profile, uiText } = useContent();
   return (
     <LiquidGlassCard
       sx={{

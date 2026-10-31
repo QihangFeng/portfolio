@@ -4,6 +4,16 @@ body,
   min-height: 100%;
 }
 
+[lang="zh-CN"] :is(
+  .MuiTypography-root,
+  .MuiButtonBase-root,
+  .MuiInputBase-root,
+  .MuiInputLabel-root,
+  .MuiChip-root
+) {
+  font-family: "Roboto", "Noto Sans SC", "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+
 body {
   margin: 0;
   background-color: #ffffff;

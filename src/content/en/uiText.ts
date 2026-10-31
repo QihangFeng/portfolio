@@ -1,18 +1,13 @@
-import type { PanelId } from "../types/navigation";
+import type { UiText } from "../types";
 
-interface NavigationItem {
-  label: string;
-  value: PanelId;
-}
-
-const uiText = {
+const uiText: UiText = {
   navigation: [
     { label: "Home", value: "home" },
     { label: "About", value: "about" },
     { label: "Skills", value: "skills" },
     { label: "Projects", value: "projects" },
     { label: "Contact", value: "contact" },
-  ] satisfies NavigationItem[],
+  ],
   hero: {
     eyebrow: "Software Engineering Portfolio · Work in Progress",
     start: "Start",
@@ -54,6 +49,10 @@ const uiText = {
   },
   footer: {
     rightsReserved: "All rights reserved.",
+  },
+  language: {
+    buttonLabel: "中文",
+    switchLabel: "Switch to Simplified Chinese",
   },
 };
 

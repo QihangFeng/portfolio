@@ -11,12 +11,12 @@ import {
 
 import EmailIcon from "@mui/icons-material/Email";
 import LiquidGlassCard from "./LiquidGlassCard";
-import profile from "../content/profile";
-import uiText from "../content/uiText";
+import { useContent } from "../content/useContent";
 
 function ContactCard() {
+  const { profile, uiText } = useContent();
   const formRef = useRef<HTMLFormElement | null>(null);
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const contactLinks = [
@@ -29,14 +29,14 @@ function ContactCard() {
   ];
 
   function handleSubmit() {
-    setStatus(uiText.contact.sending);
+    setStatus("sending");
     setIsSubmitting(true);
   }
 
   function handleIframeLoad() {
     if (!isSubmitting) return;
 
-    setStatus(uiText.contact.sentSuccessfully);
+    setStatus("sent");
     setIsSubmitting(false);
     formRef.current?.reset();
   }
@@ -177,17 +177,19 @@ function ContactCard() {
                   : uiText.contact.sendMessage}
               </Button>
 
-              {status && (
+              {status !== "idle" && (
                 <Typography
                   variant="body2"
                   sx={{
-                    color: status === uiText.contact.sentSuccessfully
+                    color: status === "sent"
                       ? "success.main"
                       : "text.secondary",
                     fontWeight: 600,
                   }}
                 >
-                  {status}
+                  {status === "sent"
+                    ? uiText.contact.sentSuccessfully
+                    : uiText.contact.sending}
                 </Typography>
               )}
             </Stack>

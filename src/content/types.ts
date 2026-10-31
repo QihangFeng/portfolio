@@ -1,3 +1,5 @@
+import type { PanelId } from "../types/navigation";
+
 export type SkillGroupId =
   | "backend"
   | "frontend"
@@ -75,4 +77,59 @@ export interface PortfolioProfile {
   skillGroups: SkillGroup[];
   projects: Project[];
   contact: ContactContent;
+}
+export type Language = "en" | "zh-CN";
+
+export interface NavigationItem {
+  label: string;
+  value: PanelId;
+}
+
+export interface UiText {
+  navigation: NavigationItem[];
+  hero: {
+    eyebrow: string;
+    start: string;
+    next: string;
+    downloadResume: string;
+  };
+  social: Record<SocialLinkId, string>;
+  about: {
+    experienceHeading: string;
+    educationHeading: string;
+  };
+  skills: {
+    heading: string;
+    introduction: string;
+  };
+  projects: {
+    heading: string;
+    introduction: string;
+    viewOnGitHub: string;
+  };
+  contact: {
+    heading: string;
+    emailLabel: string;
+    quickMessageHeading: string;
+    nameLabel: string;
+    emailFieldLabel: string;
+    messageLabel: string;
+    sendMessage: string;
+    sending: string;
+    sentSuccessfully: string;
+    helperText: string;
+    hiddenFrameTitle: string;
+  };
+  footer: {
+    rightsReserved: string;
+  };
+  language: {
+    buttonLabel: string;
+    switchLabel: string;
+  };
+}
+
+export interface LocalizedContent {
+  profile: PortfolioProfile;
+  uiText: UiText;
 }

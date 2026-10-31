@@ -16,8 +16,7 @@ import ImageSearchIcon from "@mui/icons-material/ImageSearch";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import WebIcon from "@mui/icons-material/Web";
 import LiquidGlassCard from "./LiquidGlassCard";
-import profile from "../content/profile";
-import uiText from "../content/uiText";
+import { useContent } from "../content/useContent";
 import type { ProjectId } from "../content/types";
 
 const projectIcons = {
@@ -28,6 +27,7 @@ const projectIcons = {
 } satisfies Record<ProjectId, ReactNode>;
 
 function ProjectsCard() {
+  const { profile, uiText } = useContent();
   return (
     <LiquidGlassCard
       sx={{

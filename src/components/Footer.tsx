@@ -1,8 +1,8 @@
 import { Box, Typography } from "@mui/material";
-import profile from "../content/profile";
-import uiText from "../content/uiText";
+import { useContent } from "../content/useContent";
 
 function Footer() {
+  const { profile, uiText } = useContent();
   return (
     <Box
       component="footer"

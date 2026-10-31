@@ -20,8 +20,7 @@ import ProjectsCard from "./ProjectsCard";
 import ContactCard from "./ContactCard";
 import CardFlipTransition from "./CardFlipTransition";
 import ParticleFlowGroup from "./ParticleFlowGroup";
-import profile from "../content/profile";
-import uiText from "../content/uiText";
+import { useContent } from "../content/useContent";
 import type { CardPanelId, NavigationProps } from "../types/navigation";
 
 const panelComponents = {
@@ -37,6 +36,7 @@ function renderPanel(panel: CardPanelId) {
 }
 
 function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
+  const { language, profile, uiText } = useContent();
   const hasActivePanel = activePanel !== "home";
   const [hasPanelInLayout, setHasPanelInLayout] = useState(hasActivePanel);
 
@@ -78,6 +78,7 @@ function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
           }}
         >
           <ParticleFlowGroup
+            contentVersion={language}
             transitionKey={hasPanelInLayout}
             direction={hasPanelInLayout ? -1 : 1}
             sx={{

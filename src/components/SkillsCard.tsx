@@ -8,8 +8,7 @@ import TerminalIcon from "@mui/icons-material/Terminal";
 import BuildIcon from "@mui/icons-material/Build";
 import WebIcon from "@mui/icons-material/Web";
 import LiquidGlassCard from "./LiquidGlassCard";
-import profile from "../content/profile";
-import uiText from "../content/uiText";
+import { useContent } from "../content/useContent";
 import type { SkillGroupId } from "../content/types";
 
 const skillIcons = {
@@ -22,6 +21,7 @@ const skillIcons = {
 } satisfies Record<SkillGroupId, ReactNode>;
 
 function SkillsCard() {
+  const { profile, uiText } = useContent();
   return (
     <LiquidGlassCard
       sx={{

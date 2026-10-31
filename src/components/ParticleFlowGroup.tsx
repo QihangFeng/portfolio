@@ -35,6 +35,7 @@ interface ParticleFlowGroupProps extends BoxProps {
   transitionKey: boolean;
   direction: -1 | 1;
   maxParticles?: number;
+  contentVersion?: string;
 }
 
 type ElementRenderer = typeof import("html2canvas")["default"];
@@ -213,6 +214,7 @@ function ParticleFlowGroup({
   transitionKey,
   direction,
   maxParticles = 6200,
+  contentVersion = "en",
   sx,
   ...boxProps
 }: ParticleFlowGroupProps) {
@@ -220,10 +222,16 @@ function ParticleFlowGroup({
   const rootRef = useRef<HTMLDivElement | null>(null);
   const snapshotRef = useRef<ElementSnapshot | null>(null);
   const previousKeyRef = useRef(transitionKey);
+  const previousContentVersionRef = useRef(contentVersion);
 
   useLayoutEffect(() => {
     if (!rootRef.current) return undefined;
     const root = rootRef.current;
+
+    if (previousContentVersionRef.current !== contentVersion) {
+      previousContentVersionRef.current = contentVersion;
+      snapshotRef.current = null;
+    }
 
     let active = true;
     let animationFrame: number | undefined;
@@ -480,7 +488,7 @@ function ParticleFlowGroup({
       sourceOverlay?.remove();
       flowCanvas?.remove();
     };
-  }, [direction, maxParticles, reduceMotion, transitionKey]);
+  }, [contentVersion, direction, maxParticles, reduceMotion, transitionKey]);
 
   return (
     <Box ref={rootRef} {...boxProps} sx={sx}>
