@@ -41,11 +41,11 @@ const projectText: Record<
 };
 
 const profile: PortfolioProfile = {
-  name: sharedProfile.name,
-  siteTitle: "Qihang Feng 的个人作品集",
+  name: "冯启航",
+  siteTitle: "冯启航的个人作品集",
   initials: sharedProfile.initials,
   hero: {
-    greeting: "你好，我是 Qihang Feng。",
+    greeting: "你好，我是冯启航。",
     headline:
       "我是一名工程硕士生，使用 React、FastAPI、PyTorch 和 SQL 构建全栈应用与机器学习项目。",
     summary:
@@ -99,7 +99,7 @@ const profile: PortfolioProfile = {
     introduction:
       "欢迎就软件开发、全栈项目、机器学习研究及技术合作机会与我联系。",
     email: sharedProfile.email,
-    formSubject: "来自 Qihang Feng 个人作品集的新留言",
+    formSubject: "来自冯启航个人作品集的新留言",
   },
 };
 
