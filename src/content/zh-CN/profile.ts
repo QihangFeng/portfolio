@@ -14,6 +14,12 @@ const projectText: Record<
   ProjectId,
   Pick<Project, "title" | "type" | "description">
 > = {
+  roboticPushing: {
+    title: "基于扩散策略的高效机器人推物",
+    type: "机器人学习、计算机视觉与信息物理系统",
+    description:
+      "在 PushT 仿真中结合自适应动作执行与基于自模仿的微调，利用视觉反馈提升机器人推物成功率，同时减少模型预测次数并缩短平均运行时间。",
+  },
   portfolio: {
     title: "个人作品集网站",
     type: "前端开发",

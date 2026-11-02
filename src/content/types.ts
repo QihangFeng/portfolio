@@ -9,6 +9,7 @@ export type SkillGroupId =
   | "tools";
 
 export type ProjectId =
+  | "roboticPushing"
   | "portfolio"
   | "lime"
   | "objectPlacement"

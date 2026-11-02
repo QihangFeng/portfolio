@@ -47,6 +47,11 @@ const sharedProfile: SharedProfile = {
   ],
   projects: [
     {
+      id: "roboticPushing",
+      tech: ["PyTorch", "Diffusion Policy", "PushT", "OpenCV", "Fine-tuning"],
+      link: "https://github.com/QihangFeng/pusht-prediction-utilization",
+    },
+    {
       id: "portfolio",
       tech: ["React", "Vite", "Material UI", "GitHub Pages", "Web3Forms"],
       link: "https://github.com/QihangFeng/portfolio",

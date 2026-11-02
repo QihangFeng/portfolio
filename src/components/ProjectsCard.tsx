@@ -15,11 +15,13 @@ import PsychologyIcon from "@mui/icons-material/Psychology";
 import ImageSearchIcon from "@mui/icons-material/ImageSearch";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import WebIcon from "@mui/icons-material/Web";
+import SmartToyIcon from "@mui/icons-material/SmartToy";
 import LiquidGlassCard from "./LiquidGlassCard";
 import { useContent } from "../content/useContent";
 import type { ProjectId } from "../content/types";
 
 const projectIcons = {
+  roboticPushing: <SmartToyIcon />,
   portfolio: <WebIcon />,
   lime: <PsychologyIcon />,
   objectPlacement: <ImageSearchIcon />,
@@ -98,7 +100,7 @@ function ProjectsCard() {
                   {project.description}
                 </Typography>
 
-                <Stack direction="row" spacing={1} useFlexGap>
+                <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap" }}>
                   {project.tech.map((item) => (
                     <Chip
                       key={item}

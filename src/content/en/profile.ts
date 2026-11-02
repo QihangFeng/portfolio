@@ -14,6 +14,12 @@ const projectText: Record<
   ProjectId,
   Pick<Project, "title" | "type" | "description">
 > = {
+  roboticPushing: {
+    title: "Efficient Robotic Pushing with Diffusion Policy",
+    type: "Robot Learning, Computer Vision & Cyber-Physical Systems",
+    description:
+      "Combined adaptive action execution and self-imitation-based fine-tuning in PushT simulation, using visual feedback to improve pushing success while reducing model prediction calls and average runtime.",
+  },
   portfolio: {
     title: "Personal Portfolio Website",
     type: "Frontend Development",
