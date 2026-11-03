@@ -12,6 +12,7 @@ import {
 import EmailIcon from "@mui/icons-material/Email";
 import LiquidGlassCard from "./LiquidGlassCard";
 import { useContent } from "../content/useContent";
+import { PORTRAIT_LAYOUT } from "../theme/portrait";
 
 function ContactCard() {
   const { profile, uiText } = useContent();
@@ -51,6 +52,15 @@ function ContactCard() {
         border: "1px solid",
         borderColor: "divider",
         backgroundColor: "#fafafa",
+        [PORTRAIT_LAYOUT]: {
+          p: { xs: 2.5, sm: 3 },
+          height: "auto",
+          maxHeight: "none",
+          overflow: "visible",
+          "& .MuiTypography-h4": { fontSize: "1.75rem", lineHeight: 1.25 },
+          "& .MuiInputBase-input": { fontSize: "1rem" },
+          "& .MuiOutlinedInput-root:not(.MuiInputBase-multiline)": { minHeight: 48 },
+        },
       }}
     >
       <Stack spacing={3}>
@@ -87,9 +97,21 @@ function ContactCard() {
                   boxShadow: 3,
                   backgroundColor: "white",
                 },
+                [PORTRAIT_LAYOUT]: {
+                  minHeight: 60,
+                  minWidth: 0,
+                  "@media (hover: none)": {
+                    "&:hover": { transform: "none", boxShadow: "none" },
+                  },
+                },
               }}
             >
-              <Box sx={{ textAlign: "left" }}>
+              <Box
+                sx={{
+                  textAlign: "left",
+                  [PORTRAIT_LAYOUT]: { minWidth: 0, overflowWrap: "anywhere" },
+                }}
+              >
                 <Typography>{item.label}</Typography>
                 <Typography variant="body2" color="text.secondary">
                   {item.value}
@@ -160,7 +182,19 @@ function ContactCard() {
               required
             />
 
-            <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
+            <Stack
+              direction="row"
+              spacing={2}
+              sx={{
+                alignItems: "center",
+                [PORTRAIT_LAYOUT]: {
+                  flexDirection: "column",
+                  alignItems: "stretch",
+                  gap: 1.5,
+                  "& > :not(style) ~ :not(style)": { ml: 0, mt: 0 },
+                },
+              }}
+            >
               <Button
                 type="submit"
                 variant="contained"
@@ -170,6 +204,7 @@ function ContactCard() {
                   fontWeight: 700,
                   borderRadius: 2,
                   px: 3,
+                  [PORTRAIT_LAYOUT]: { width: "100%", minHeight: 48 },
                 }}
               >
                 {isSubmitting

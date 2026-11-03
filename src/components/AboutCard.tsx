@@ -5,6 +5,7 @@ import WorkIcon from "@mui/icons-material/Work";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import LiquidGlassCard from "./LiquidGlassCard";
 import { useContent } from "../content/useContent";
+import { PORTRAIT_LAYOUT } from "../theme/portrait";
 
 function AboutCard() {
   const { profile, uiText } = useContent();
@@ -18,13 +19,39 @@ function AboutCard() {
         overflow: "auto",
         borderColor: "divider",
         backgroundColor: "#fafafa",
+        [PORTRAIT_LAYOUT]: {
+          p: { xs: 2.5, sm: 3 },
+          height: "auto",
+          maxHeight: "none",
+          overflow: "visible",
+          "& .MuiTypography-h5": { fontSize: "1.2rem", lineHeight: 1.35 },
+          "& .MuiTypography-h6": { fontSize: "1rem", lineHeight: 1.4 },
+          "& .MuiTypography-body2": { lineHeight: 1.5 },
+        },
       }}
     >
       <Stack spacing={3}>
         {/* Header */}
         <Stack
           direction={"row"}
-          sx={{ justifyContent: "space-around", alignItems: "center" }}
+          sx={{
+            justifyContent: "space-around",
+            alignItems: "center",
+            [PORTRAIT_LAYOUT]: {
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "72px minmax(0, 1fr)",
+                sm: "88px minmax(0, 1fr)",
+              },
+              gap: 2,
+              alignItems: "start",
+              "@media (max-width: 399.95px)": {
+                gridTemplateColumns: "minmax(0, 1fr)",
+                justifyItems: "center",
+                textAlign: "center",
+              },
+            },
+          }}
         >
           <Avatar
             sx={{
@@ -33,32 +60,87 @@ function AboutCard() {
               fontSize: 44,
               fontWeight: 800,
               bgcolor: "primary.main",
+              [PORTRAIT_LAYOUT]: {
+                width: { xs: 72, sm: 88 },
+                height: { xs: 72, sm: 88 },
+                fontSize: { xs: 28, sm: 32 },
+              },
             }}
           >
             {profile.initials}
           </Avatar>
 
-          <Box sx={{ width: "65%" }}>
-            <Typography variant="h4" sx={{ fontWeight: 600 }}>
+          <Box
+            sx={{
+              width: "65%",
+              [PORTRAIT_LAYOUT]: {
+                width: "auto",
+                minWidth: 0,
+                "@media (max-width: 399.95px)": { width: "100%" },
+              },
+            }}
+          >
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: 600,
+                [PORTRAIT_LAYOUT]: {
+                  fontSize: { xs: "1.4rem", sm: "1.75rem" },
+                  lineHeight: 1.25,
+                },
+              }}
+            >
               {profile.name}
             </Typography>
 
-            <Stack direction={"row"} sx={{ alignItems: "center" }}>
-              <LocationOnIcon />
+            <Stack
+              direction={"row"}
+              sx={{
+                alignItems: "center",
+                [PORTRAIT_LAYOUT]: {
+                  mt: 0.75,
+                  alignItems: "flex-start",
+                  gap: 0.5,
+                  "@media (max-width: 399.95px)": { justifyContent: "center" },
+                },
+              }}
+            >
+              <LocationOnIcon
+                sx={{ [PORTRAIT_LAYOUT]: { fontSize: 18, mt: 0.25, flexShrink: 0 } }}
+              />
               <Typography color="text.secondary">
                 {profile.about.location}
               </Typography>
             </Stack>
 
-            <Typography color="text.secondary" sx={{ mt: 1, ml: 0.6}}>
+            <Typography
+              color="text.secondary"
+              sx={{
+                mt: 1,
+                ml: 0.6,
+                [PORTRAIT_LAYOUT]: { ml: 0, fontSize: "0.9375rem", lineHeight: 1.5 },
+              }}
+            >
               {profile.about.role}
             </Typography>
 
-            <Typography color="text.secondary" sx={{ml: 0.6}}>
+            <Typography
+              color="text.secondary"
+              sx={{
+                ml: 0.6,
+                [PORTRAIT_LAYOUT]: { ml: 0, mt: 0.5, fontSize: "0.9375rem" },
+              }}
+            >
               {profile.about.gpa}
             </Typography>
 
-            <Typography color="text.secondary" sx={{ml: 0.6}}>
+            <Typography
+              color="text.secondary"
+              sx={{
+                ml: 0.6,
+                [PORTRAIT_LAYOUT]: { ml: 0, mt: 0.5, fontSize: "0.9375rem", lineHeight: 1.5 },
+              }}
+            >
               {profile.about.graduation}
             </Typography>
           </Box>
@@ -94,7 +176,13 @@ function AboutCard() {
               <Typography variant="body2" color="text.secondary">
                 {experience.period}
               </Typography>
-              <Stack direction={"row"} sx={{ alignItems: "center" }}>
+              <Stack
+                direction={"row"}
+                sx={{
+                  alignItems: "center",
+                  [PORTRAIT_LAYOUT]: { alignItems: "flex-start", gap: 0.5, mt: 0.5 },
+                }}
+              >
                 <LocationOnIcon sx={{ fontSize: 16 }} />
                 <Typography variant="body2" color="text.secondary">
                   {experience.location}

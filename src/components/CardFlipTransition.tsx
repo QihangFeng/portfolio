@@ -7,6 +7,8 @@ interface CardFlipTransitionProps {
   activePanel: PanelId;
   onPresenceChange: (isPresent: boolean) => void;
   renderPanel: (panel: CardPanelId) => ReactNode;
+  layoutVersion?: string;
+  compact?: boolean;
 }
 
 interface DetachedLayout {
@@ -46,6 +48,8 @@ function CardFlipTransition({
   activePanel,
   onPresenceChange,
   renderPanel,
+  layoutVersion = "",
+  compact = false,
 }: CardFlipTransitionProps) {
   const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const requestedPanel = activePanel === "home" ? null : activePanel;
@@ -64,6 +68,7 @@ function CardFlipTransition({
   const phaseRef = useRef<TransitionPhase>("idle");
   const flipDirectionRef = useRef<FlipDirection>(1);
   const frameRef = useRef<number | null>(null);
+  const previousLayoutVersionRef = useRef(layoutVersion);
 
   const scheduleToRest = useCallback((phase: RestPhase) => {
     frameRef.current = requestAnimationFrame(() => {
@@ -114,6 +119,12 @@ function CardFlipTransition({
         });
       }
 
+      if (compact) {
+        // Freeze the outgoing card at its current viewport position before
+        // returning the page to the Home introduction at the top.
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      }
+
       onPresenceChange(false);
       phaseRef.current = "exiting";
       setTransitionKind("slide-exit");
@@ -131,13 +142,15 @@ function CardFlipTransition({
     setSlideOffset("0px");
     setOpacity(0.55);
     setRotation(90 * flipDirectionRef.current);
-  }, [onPresenceChange, scheduleToRest]);
+  }, [compact, onPresenceChange, scheduleToRest]);
 
   useEffect(() => {
     requestedPanelRef.current = requestedPanel;
+    const layoutChanged = previousLayoutVersionRef.current !== layoutVersion;
+    previousLayoutVersionRef.current = layoutVersion;
 
     const frame = requestAnimationFrame(() => {
-      if (reduceMotion) {
+      if (reduceMotion || layoutChanged) {
         if (frameRef.current !== null) {
           cancelAnimationFrame(frameRef.current);
           frameRef.current = null;
@@ -160,7 +173,7 @@ function CardFlipTransition({
     });
 
     return () => cancelAnimationFrame(frame);
-  }, [onPresenceChange, requestedPanel, reduceMotion, startTransition]);
+  }, [layoutVersion, onPresenceChange, requestedPanel, reduceMotion, startTransition]);
 
   useEffect(() => {
     return () => {
@@ -186,6 +199,9 @@ function CardFlipTransition({
       setRotation(0);
       setSlideOffset("0px");
       setOpacity(1);
+      if (requestedPanelRef.current !== null) {
+        frameRef.current = requestAnimationFrame(startTransition);
+      }
       return;
     }
 
@@ -261,12 +277,12 @@ function CardFlipTransition({
           pointerEvents: isAnimating ? "none" : "auto",
           transition: transitionEnabled
             ? transitionKind === "flip"
-              ? `transform ${HALF_FLIP_DURATION}ms ease-in-out, opacity ${HALF_FLIP_DURATION}ms ease-in-out`
-              : `transform ${SLIDE_DURATION}ms ${
+              ? `transform ${compact ? 180 : HALF_FLIP_DURATION}ms ease-in-out, opacity ${compact ? 180 : HALF_FLIP_DURATION}ms ease-in-out`
+              : `transform ${compact ? 400 : SLIDE_DURATION}ms ${
                   transitionKind === "slide-enter"
                     ? SLIDE_ENTER_EASING
                     : SLIDE_EXIT_EASING
-                }, opacity ${SLIDE_DURATION}ms ease`
+                }, opacity ${compact ? 400 : SLIDE_DURATION}ms ease`
             : "none",
           willChange: transitionEnabled ? "transform, opacity" : "auto",
         }}

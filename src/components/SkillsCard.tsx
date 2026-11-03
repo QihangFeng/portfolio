@@ -10,6 +10,7 @@ import WebIcon from "@mui/icons-material/Web";
 import LiquidGlassCard from "./LiquidGlassCard";
 import { useContent } from "../content/useContent";
 import type { SkillGroupId } from "../content/types";
+import { PORTRAIT_LAYOUT } from "../theme/portrait";
 
 const skillIcons = {
   frontend: <WebIcon />,
@@ -32,6 +33,14 @@ function SkillsCard() {
         height: { md: "75vh" },
         overflowY: "auto",
         backgroundColor: "#fafafa",
+        [PORTRAIT_LAYOUT]: {
+          p: { xs: 2.5, sm: 3 },
+          height: "auto",
+          maxHeight: "none",
+          overflow: "visible",
+          "& .MuiTypography-h4": { fontSize: "1.75rem", lineHeight: 1.25 },
+          "& .MuiTypography-h6": { fontSize: "1.05rem", lineHeight: 1.4 },
+        },
       }}
     >
       <Stack spacing={3}>
@@ -53,6 +62,13 @@ function SkillsCard() {
             gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
             gap: 2.5,
             alignItems: "stretch",
+            [PORTRAIT_LAYOUT]: {
+              gridTemplateColumns: {
+                xs: "minmax(0, 1fr)",
+                sm: "repeat(2, minmax(0, 1fr))",
+              },
+              gap: 1.5,
+            },
           }}
         >
           {profile.skillGroups.map((group) => (
@@ -69,6 +85,12 @@ function SkillsCard() {
                 "&:hover": {
                   transform: "translateY(-4px)",
                   boxShadow: 3,
+                },
+                [PORTRAIT_LAYOUT]: {
+                  p: 2,
+                  "@media (hover: none)": {
+                    "&:hover": { transform: "none", boxShadow: "none" },
+                  },
                 },
               }}
             >
@@ -90,7 +112,11 @@ function SkillsCard() {
                 direction="row"
                 spacing={1}
                 useFlexGap
-                sx={{ mt: 2, flexWrap: "wrap" }}
+                sx={{
+                  mt: 2,
+                  flexWrap: "wrap",
+                  [PORTRAIT_LAYOUT]: { mt: 1.5, gap: 0.75 },
+                }}
               >
                 {group.skills.map((skill) => (
                   <Chip
@@ -100,6 +126,7 @@ function SkillsCard() {
                     sx={{
                       fontWeight: 600,
                       borderRadius: 2,
+                      [PORTRAIT_LAYOUT]: { fontSize: "0.75rem", height: 28 },
                     }}
                   />
                 ))}

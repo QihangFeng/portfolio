@@ -22,6 +22,7 @@ import CardFlipTransition from "./CardFlipTransition";
 import ParticleFlowGroup from "./ParticleFlowGroup";
 import { useContent } from "../content/useContent";
 import type { CardPanelId, NavigationProps } from "../types/navigation";
+import { PORTRAIT_LAYOUT } from "../theme/portrait";
 
 const panelComponents = {
   about: AboutCard,
@@ -35,7 +36,12 @@ function renderPanel(panel: CardPanelId) {
   return Panel ? <Panel /> : null;
 }
 
-function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
+interface HeroSectionProps extends NavigationProps {
+  isPortrait: boolean;
+  layoutVersion: string;
+}
+
+function HeroSection({ activePanel, setActivePanel, isPortrait, layoutVersion }: HeroSectionProps) {
   const { language, profile, uiText } = useContent();
   const hasActivePanel = activePanel !== "home";
   const [hasPanelInLayout, setHasPanelInLayout] = useState(hasActivePanel);
@@ -61,9 +67,20 @@ function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
       sx={{
         py: { xs: 4, md: 6 },
         overflowX: "clip",
+        [PORTRAIT_LAYOUT]: {
+          width: "100%",
+          py: hasPanelInLayout ? 3 : { xs: 4, sm: 6 },
+          overflowX: "clip",
+          overflowY: "visible",
+        },
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth="lg" sx={{
+        [PORTRAIT_LAYOUT]: {
+          maxWidth: 720,
+          px: { xs: 3, sm: 4 },
+        },
+      }}>
         <Box
           sx={{
             position: "relative",
@@ -75,10 +92,18 @@ function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
             gap: { xs: 4, md: 8 },
             alignItems: "center",
             transition: "all 500ms ease",
+            [PORTRAIT_LAYOUT]: {
+              gridTemplateColumns: "minmax(0, 1fr)",
+              gap: 0,
+              alignItems: "start",
+              transition: "none",
+            },
           }}
         >
           <ParticleFlowGroup
-            contentVersion={language}
+            contentVersion={`${language}:${layoutVersion}`}
+            maxParticles={isPortrait ? 2600 : 6200}
+            durationScale={isPortrait ? 0.8 : 1}
             transitionKey={hasPanelInLayout}
             direction={hasPanelInLayout ? -1 : 1}
             sx={{
@@ -88,6 +113,21 @@ function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
                 ? "translateX(-10px)"
                 : "translateX(0)",
               transition: "all 500ms ease",
+              [PORTRAIT_LAYOUT]: {
+                width: "100%",
+                maxWidth: "none",
+                mx: 0,
+                transform: "none",
+                transition: "none",
+                ...(hasPanelInLayout && {
+                  position: "fixed",
+                  top: "calc(20.75px + env(safe-area-inset-top, 0px))",
+                  left: { xs: 64, sm: "max(76px, calc((100% - 760px) / 2 + 76px))" },
+                  width: "auto",
+                  maxWidth: "calc(100% - 184px)",
+                  zIndex: 1301,
+                }),
+              },
             }}
           >
             <Typography
@@ -96,6 +136,12 @@ function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
                 color: "primary.main",
                 fontWeight: 700,
                 letterSpacing: 1.5,
+                [PORTRAIT_LAYOUT]: {
+                  display: hasPanelInLayout ? "none" : "block",
+                  fontSize: "0.625rem",
+                  lineHeight: 1.8,
+                  letterSpacing: 1.2,
+                },
               }}
             >
               {uiText.hero.eyebrow}
@@ -112,9 +158,16 @@ function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
                   xs: "2.6rem",
                   md: hasPanelInLayout ? "3.2rem" : "4rem",
                 },
+                [PORTRAIT_LAYOUT]: {
+                  mt: hasPanelInLayout ? 0 : 1.5,
+                  fontSize: hasPanelInLayout ? "0.9375rem" : "clamp(2rem, 8.5vw, 3rem)",
+                  fontWeight: hasPanelInLayout ? 700 : 800,
+                  lineHeight: hasPanelInLayout ? 1.5 : 1.15,
+                  letterSpacing: hasPanelInLayout ? 0 : "-0.025em",
+                },
               }}
             >
-              {profile.hero.greeting}
+              {isPortrait && hasPanelInLayout ? profile.name : profile.hero.greeting}
             </Typography>
 
             <Typography
@@ -123,6 +176,12 @@ function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
                 mt: 2,
                 color: "text.secondary",
                 lineHeight: 1.5,
+                [PORTRAIT_LAYOUT]: {
+                  display: hasPanelInLayout ? "none" : "block",
+                  mt: 2.5,
+                  fontSize: { xs: "1.0625rem", sm: "1.25rem" },
+                  lineHeight: 1.65,
+                },
               }}
             >
               {profile.hero.headline}
@@ -134,6 +193,12 @@ function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
                 mt: 3,
                 color: "text.secondary",
                 lineHeight: 1.8,
+                [PORTRAIT_LAYOUT]: {
+                  display: hasPanelInLayout ? "none" : "block",
+                  mt: 2,
+                  fontSize: "0.9375rem",
+                  lineHeight: 1.75,
+                },
               }}
             >
               {profile.hero.summary}
@@ -142,7 +207,12 @@ function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
             <Stack
               direction={{ xs: "column", sm: "row" }}
               spacing={2}
-              sx={{ mt: 4 }}
+              sx={{ mt: 4, [PORTRAIT_LAYOUT]: {
+                display: hasPanelInLayout ? "none" : "flex",
+                mt: 3,
+                gap: 1.5,
+                "& > :not(style) ~ :not(style)": { mt: 0, ml: 0 },
+              } }}
             >
               <Button
                 variant="contained"
@@ -155,6 +225,7 @@ function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
                   borderRadius: 2,
                   px: 3,
                   width: { xs: "100%", sm: "fit-content" },
+                  [PORTRAIT_LAYOUT]: { minHeight: 48 },
                 }}
               >
                 {hasPanelInLayout ? uiText.hero.next : uiText.hero.start}
@@ -176,6 +247,7 @@ function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
                   borderColor: "grey.400",
                   backgroundColor: "rgba(255, 255, 255, 0.75)",
                   backdropFilter: "blur(4px)",
+                  [PORTRAIT_LAYOUT]: { minHeight: 48 },
 
                   "&:hover": {
                     borderColor: "grey.600",
@@ -193,6 +265,11 @@ function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
               sx={{
                 mt: 4,
                 alignItems: "center",
+                [PORTRAIT_LAYOUT]: {
+                  display: hasPanelInLayout ? "none" : "flex",
+                  mt: 3,
+                  "& .MuiIconButton-root": { width: 48, height: 48 },
+                },
               }}
             >
               <IconButton
@@ -231,6 +308,8 @@ function HeroSection({ activePanel, setActivePanel }: NavigationProps) {
             activePanel={activePanel}
             onPresenceChange={setHasPanelInLayout}
             renderPanel={renderPanel}
+            layoutVersion={layoutVersion}
+            compact={isPortrait}
           />
         </Box>
       </Container>
