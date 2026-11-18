@@ -31,9 +31,9 @@ const panelComponents = {
   contact: ContactCard,
 } satisfies Record<CardPanelId, ComponentType>;
 
-function renderPanel(panel: CardPanelId) {
+function renderPanel(panel: CardPanelId, disableRipple: boolean) {
   const Panel = panelComponents[panel];
-  return Panel ? <Panel /> : null;
+  return <Panel disableRipple={disableRipple} />;
 }
 
 interface HeroSectionProps extends NavigationProps {
@@ -45,6 +45,10 @@ function HeroSection({ activePanel, setActivePanel, isPortrait, layoutVersion }:
   const { language, profile, uiText } = useContent();
   const hasActivePanel = activePanel !== "home";
   const [hasPanelInLayout, setHasPanelInLayout] = useState(hasActivePanel);
+
+  if (isPortrait && hasPanelInLayout !== hasActivePanel) {
+    setHasPanelInLayout(hasActivePanel);
+  }
 
   function handleMainButtonClick() {
     if (!hasActivePanel) {
@@ -102,8 +106,7 @@ function HeroSection({ activePanel, setActivePanel, isPortrait, layoutVersion }:
         >
           <ParticleFlowGroup
             contentVersion={`${language}:${layoutVersion}`}
-            maxParticles={isPortrait ? 2600 : 6200}
-            durationScale={isPortrait ? 0.8 : 1}
+            disabled={isPortrait}
             transitionKey={hasPanelInLayout}
             direction={hasPanelInLayout ? -1 : 1}
             sx={{
@@ -114,19 +117,12 @@ function HeroSection({ activePanel, setActivePanel, isPortrait, layoutVersion }:
                 : "translateX(0)",
               transition: "all 500ms ease",
               [PORTRAIT_LAYOUT]: {
+                display: hasPanelInLayout ? "none" : "block",
                 width: "100%",
                 maxWidth: "none",
                 mx: 0,
                 transform: "none",
                 transition: "none",
-                ...(hasPanelInLayout && {
-                  position: "fixed",
-                  top: "calc(20.75px + env(safe-area-inset-top, 0px))",
-                  left: { xs: 64, sm: "max(76px, calc((100% - 760px) / 2 + 76px))" },
-                  width: "auto",
-                  maxWidth: "calc(100% - 184px)",
-                  zIndex: 1301,
-                }),
               },
             }}
           >
@@ -137,7 +133,7 @@ function HeroSection({ activePanel, setActivePanel, isPortrait, layoutVersion }:
                 fontWeight: 700,
                 letterSpacing: 1.5,
                 [PORTRAIT_LAYOUT]: {
-                  display: hasPanelInLayout ? "none" : "block",
+                  display: "block",
                   fontSize: "0.625rem",
                   lineHeight: 1.8,
                   letterSpacing: 1.2,
@@ -159,15 +155,14 @@ function HeroSection({ activePanel, setActivePanel, isPortrait, layoutVersion }:
                   md: hasPanelInLayout ? "3.2rem" : "4rem",
                 },
                 [PORTRAIT_LAYOUT]: {
-                  mt: hasPanelInLayout ? 0 : 1.5,
-                  fontSize: hasPanelInLayout ? "0.9375rem" : "clamp(2rem, 8.5vw, 3rem)",
-                  fontWeight: hasPanelInLayout ? 700 : 800,
-                  lineHeight: hasPanelInLayout ? 1.5 : 1.15,
-                  letterSpacing: hasPanelInLayout ? 0 : "-0.025em",
+                  mt: 1.5,
+                  fontSize: "clamp(2rem, 8.5vw, 3rem)",
+                  lineHeight: 1.15,
+                  letterSpacing: "-0.025em",
                 },
               }}
             >
-              {isPortrait && hasPanelInLayout ? profile.name : profile.hero.greeting}
+              {profile.hero.greeting}
             </Typography>
 
             <Typography
@@ -177,7 +172,6 @@ function HeroSection({ activePanel, setActivePanel, isPortrait, layoutVersion }:
                 color: "text.secondary",
                 lineHeight: 1.5,
                 [PORTRAIT_LAYOUT]: {
-                  display: hasPanelInLayout ? "none" : "block",
                   mt: 2.5,
                   fontSize: { xs: "1.0625rem", sm: "1.25rem" },
                   lineHeight: 1.65,
@@ -194,7 +188,6 @@ function HeroSection({ activePanel, setActivePanel, isPortrait, layoutVersion }:
                 color: "text.secondary",
                 lineHeight: 1.8,
                 [PORTRAIT_LAYOUT]: {
-                  display: hasPanelInLayout ? "none" : "block",
                   mt: 2,
                   fontSize: "0.9375rem",
                   lineHeight: 1.75,
@@ -208,7 +201,6 @@ function HeroSection({ activePanel, setActivePanel, isPortrait, layoutVersion }:
               direction={{ xs: "column", sm: "row" }}
               spacing={2}
               sx={{ mt: 4, [PORTRAIT_LAYOUT]: {
-                display: hasPanelInLayout ? "none" : "flex",
                 mt: 3,
                 gap: 1.5,
                 "& > :not(style) ~ :not(style)": { mt: 0, ml: 0 },
@@ -217,6 +209,7 @@ function HeroSection({ activePanel, setActivePanel, isPortrait, layoutVersion }:
               <Button
                 variant="contained"
                 size="large"
+                disableRipple={isPortrait}
                 onClick={handleMainButtonClick}
                 endIcon={<ArrowForwardIcon />}
                 sx={{
@@ -234,6 +227,7 @@ function HeroSection({ activePanel, setActivePanel, isPortrait, layoutVersion }:
               <Button
                 variant="outlined"
                 size="large"
+                disableRipple={isPortrait}
                 href={`${import.meta.env.BASE_URL}${profile.resumeFile}`}
                 download
                 startIcon={<DownloadIcon />}
@@ -266,13 +260,13 @@ function HeroSection({ activePanel, setActivePanel, isPortrait, layoutVersion }:
                 mt: 4,
                 alignItems: "center",
                 [PORTRAIT_LAYOUT]: {
-                  display: hasPanelInLayout ? "none" : "flex",
                   mt: 3,
                   "& .MuiIconButton-root": { width: 48, height: 48 },
                 },
               }}
             >
               <IconButton
+                disableRipple={isPortrait}
                 href={profile.socialLinks.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -283,6 +277,7 @@ function HeroSection({ activePanel, setActivePanel, isPortrait, layoutVersion }:
               </IconButton>
 
               <IconButton
+                disableRipple={isPortrait}
                 href={profile.socialLinks.github}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -293,6 +288,7 @@ function HeroSection({ activePanel, setActivePanel, isPortrait, layoutVersion }:
               </IconButton>
 
               <IconButton
+                disableRipple={isPortrait}
                 href={profile.socialLinks.youtube}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -307,9 +303,9 @@ function HeroSection({ activePanel, setActivePanel, isPortrait, layoutVersion }:
           <CardFlipTransition
             activePanel={activePanel}
             onPresenceChange={setHasPanelInLayout}
-            renderPanel={renderPanel}
+            renderPanel={(panel) => renderPanel(panel, isPortrait)}
             layoutVersion={layoutVersion}
-            compact={isPortrait}
+            instant={isPortrait}
           />
         </Box>
       </Container>

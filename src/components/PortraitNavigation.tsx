@@ -46,6 +46,7 @@ function PortraitNavigation({ activePanel, setActivePanel }: NavigationProps) {
         {uiText.navigation.map((item) => (
           <BottomNavigationAction
             key={item.value}
+            disableRipple
             label={item.label}
             value={item.value}
             icon={navigationIcons[item.value]}

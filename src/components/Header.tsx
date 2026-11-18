@@ -51,12 +51,12 @@ function Header({ activePanel, setActivePanel, isPortrait }: HeaderProps) {
             lineHeight: 1.5,
             letterSpacing: 0,
             flexGrow: 1,
-            visibility: activePanel === "home" ? "visible" : "hidden",
           }}>
             {profile.name}
           </Typography>
           <Button
             variant="outlined"
+            disableRipple
             aria-label={uiText.language.switchLabel}
             lang={language === "en" ? "zh-CN" : "en"}
             onClick={() => setLanguage(current => current === "en" ? "zh-CN" : "en")}

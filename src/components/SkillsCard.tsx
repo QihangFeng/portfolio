@@ -88,9 +88,7 @@ function SkillsCard() {
                 },
                 [PORTRAIT_LAYOUT]: {
                   p: 2,
-                  "@media (hover: none)": {
-                    "&:hover": { transform: "none", boxShadow: "none" },
-                  },
+                  "&:hover": { transform: "none", boxShadow: "none" },
                 },
               }}
             >

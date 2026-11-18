@@ -24,7 +24,6 @@ interface ElementSnapshot {
   image: HTMLCanvasElement;
   particles: Particle[];
   sourceElement: HTMLElement;
-  portraitLayout: boolean;
 }
 
 interface FlowCanvas {
@@ -37,7 +36,7 @@ interface ParticleFlowGroupProps extends BoxProps {
   direction: -1 | 1;
   maxParticles?: number;
   contentVersion?: string;
-  durationScale?: number;
+  disabled?: boolean;
 }
 
 type ElementRenderer = typeof import("html2canvas")["default"];
@@ -69,7 +68,6 @@ async function captureElementSnapshot(
   const html2canvas = await loadElementRenderer();
   const rootRect = root.getBoundingClientRect();
   const sourceElement = root.cloneNode(true) as HTMLElement;
-  const portraitLayout = root.closest('[data-portrait-layout="true"]') !== null;
 
   sourceElement.style.opacity = "1";
   sourceElement.style.visibility = "visible";
@@ -147,7 +145,6 @@ async function captureElementSnapshot(
       image: renderedElement,
       particles: sampledParticles,
       sourceElement,
-      portraitLayout,
     };
   } finally {
     if (root.dataset.particleFlowCapture === marker) {
@@ -176,27 +173,12 @@ function createSourceOverlay(snapshot: ElementSnapshot): HTMLElement | null {
     zIndex: "1199",
     pointerEvents: "none",
   });
-  if (snapshot.portraitLayout) {
-    const portraitWrapper = document.createElement("div");
-    portraitWrapper.dataset.portraitLayout = "true";
-    portraitWrapper.setAttribute("aria-hidden", "true");
-    Object.assign(portraitWrapper.style, {
-      position: "fixed",
-      inset: "0",
-      zIndex: "1400",
-      pointerEvents: "none",
-    });
-    portraitWrapper.appendChild(overlay);
-    document.body.appendChild(portraitWrapper);
-    return portraitWrapper;
-  }
-
   document.body.appendChild(overlay);
 
   return overlay;
 }
 
-function createFlowCanvas(portraitLayout = false): FlowCanvas {
+function createFlowCanvas(): FlowCanvas {
   const canvas = document.createElement("canvas");
   const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
   const context = canvas.getContext("2d");
@@ -212,7 +194,7 @@ function createFlowCanvas(portraitLayout = false): FlowCanvas {
     inset: "0",
     width: `${window.innerWidth}px`,
     height: `${window.innerHeight}px`,
-    zIndex: portraitLayout ? "1401" : "1200",
+    zIndex: "1200",
     pointerEvents: "none",
   });
 
@@ -234,7 +216,7 @@ function ParticleFlowGroup({
   direction,
   maxParticles = 6200,
   contentVersion = "en",
-  durationScale = 1,
+  disabled = false,
   sx,
   ...boxProps
 }: ParticleFlowGroupProps) {
@@ -245,6 +227,12 @@ function ParticleFlowGroup({
   const previousContentVersionRef = useRef(contentVersion);
 
   useLayoutEffect(() => {
+    if (disabled) {
+      snapshotRef.current = null;
+      previousKeyRef.current = transitionKey;
+      return;
+    }
+
     if (!rootRef.current) return undefined;
     const root = rootRef.current;
 
@@ -256,11 +244,6 @@ function ParticleFlowGroup({
     let active = true;
     let animationFrame: number | undefined;
     let sourceOverlay: HTMLElement | null;
-    const scale = Number.isFinite(durationScale) ? Math.max(0.1, durationScale) : 1;
-    const dissolveDuration = DISSOLVE_DURATION * scale;
-    const flowDuration = FLOW_DURATION * scale;
-    const reassembleDuration = REASSEMBLE_DURATION * scale;
-    const particleDuration = PARTICLE_DURATION * scale;
 
     if (
       previousKeyRef.current === transitionKey ||
@@ -292,12 +275,12 @@ function ParticleFlowGroup({
 
       return {
         ...particle,
-        delay: seededValue(seed + 3.1) * 125 * scale,
+        delay: seededValue(seed + 3.1) * 125,
         curve: (seededValue(seed + 7.7) - 0.5) * 68,
       };
     });
     sourceOverlay = createSourceOverlay(previousSnapshot);
-    const { canvas, context } = createFlowCanvas(previousSnapshot.portraitLayout);
+    const { canvas, context } = createFlowCanvas();
     const startTime = performance.now();
     const originalTransitionProperty = root.style.transitionProperty;
     let targetSnapshot: ElementSnapshot | null = null;
@@ -348,9 +331,9 @@ function ParticleFlowGroup({
         now - startTime - accumulatedTargetWait,
       );
 
-      if (!targetSnapshot && elapsed >= dissolveDuration) {
+      if (!targetSnapshot && elapsed >= DISSOLVE_DURATION) {
         targetWaitStarted ??= now;
-        elapsed = dissolveDuration;
+        elapsed = DISSOLVE_DURATION;
       } else if (targetSnapshot && targetWaitStarted !== null) {
         accumulatedTargetWait += now - targetWaitStarted;
         targetWaitStarted = null;
@@ -360,16 +343,16 @@ function ParticleFlowGroup({
         );
       }
 
-      const progress = Math.min(elapsed / particleDuration, 1);
-      const dissolveProgress = Math.min(elapsed / dissolveDuration, 1);
-      const flowElapsed = Math.max(0, elapsed - dissolveDuration);
-      const flowProgress = Math.min(flowElapsed / flowDuration, 1);
+      const progress = Math.min(elapsed / PARTICLE_DURATION, 1);
+      const dissolveProgress = Math.min(elapsed / DISSOLVE_DURATION, 1);
+      const flowElapsed = Math.max(0, elapsed - DISSOLVE_DURATION);
+      const flowProgress = Math.min(flowElapsed / FLOW_DURATION, 1);
       const reassembleElapsed = Math.max(
         0,
-        elapsed - dissolveDuration - flowDuration,
+        elapsed - DISSOLVE_DURATION - FLOW_DURATION,
       );
       const reassembleProgress = Math.min(
-        reassembleElapsed / reassembleDuration,
+        reassembleElapsed / REASSEMBLE_DURATION,
         1,
       );
       const particleFormationProgress =
@@ -457,7 +440,7 @@ function ParticleFlowGroup({
           Math.max(
             0,
             (flowElapsed - particle.delay) /
-              (flowDuration - particle.delay),
+              (FLOW_DURATION - particle.delay),
           ),
         );
         const travelProgress = easeInOutCubic(localProgress);
@@ -536,7 +519,7 @@ function ParticleFlowGroup({
       sourceOverlay?.remove();
       flowCanvas?.remove();
     };
-  }, [contentVersion, direction, durationScale, maxParticles, reduceMotion, transitionKey]);
+  }, [contentVersion, direction, disabled, maxParticles, reduceMotion, transitionKey]);
 
   return (
     <Box ref={rootRef} {...boxProps} sx={sx}>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode, TransitionEvent } from "react";
 import { Box, useMediaQuery } from "@mui/material";
 import type { CardPanelId, PanelId } from "../types/navigation";
@@ -8,7 +8,7 @@ interface CardFlipTransitionProps {
   onPresenceChange: (isPresent: boolean) => void;
   renderPanel: (panel: CardPanelId) => ReactNode;
   layoutVersion?: string;
-  compact?: boolean;
+  instant?: boolean;
 }
 
 interface DetachedLayout {
@@ -49,7 +49,7 @@ function CardFlipTransition({
   onPresenceChange,
   renderPanel,
   layoutVersion = "",
-  compact = false,
+  instant = false,
 }: CardFlipTransitionProps) {
   const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const requestedPanel = activePanel === "home" ? null : activePanel;
@@ -69,6 +69,17 @@ function CardFlipTransition({
   const flipDirectionRef = useRef<FlipDirection>(1);
   const frameRef = useRef<number | null>(null);
   const previousLayoutVersionRef = useRef(layoutVersion);
+
+  // Keep the same card subtree when rotating, including a focused Contact form.
+  if (instant && (displayedPanel !== requestedPanel || isAnimating)) {
+    setDisplayedPanel(requestedPanel);
+    setRotation(0);
+    setSlideOffset("0px");
+    setOpacity(1);
+    setTransitionEnabled(false);
+    setIsAnimating(false);
+    setDetachedLayout(null);
+  }
 
   const scheduleToRest = useCallback((phase: RestPhase) => {
     frameRef.current = requestAnimationFrame(() => {
@@ -119,12 +130,6 @@ function CardFlipTransition({
         });
       }
 
-      if (compact) {
-        // Freeze the outgoing card at its current viewport position before
-        // returning the page to the Home introduction at the top.
-        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-      }
-
       onPresenceChange(false);
       phaseRef.current = "exiting";
       setTransitionKind("slide-exit");
@@ -142,12 +147,26 @@ function CardFlipTransition({
     setSlideOffset("0px");
     setOpacity(0.55);
     setRotation(90 * flipDirectionRef.current);
-  }, [compact, onPresenceChange, scheduleToRest]);
+  }, [onPresenceChange, scheduleToRest]);
+
+  useLayoutEffect(() => {
+    if (!instant) return;
+
+    if (frameRef.current !== null) {
+      cancelAnimationFrame(frameRef.current);
+      frameRef.current = null;
+    }
+    requestedPanelRef.current = requestedPanel;
+    displayedPanelRef.current = requestedPanel;
+    phaseRef.current = "idle";
+  }, [instant, requestedPanel]);
 
   useEffect(() => {
     requestedPanelRef.current = requestedPanel;
     const layoutChanged = previousLayoutVersionRef.current !== layoutVersion;
     previousLayoutVersionRef.current = layoutVersion;
+
+    if (instant) return;
 
     const frame = requestAnimationFrame(() => {
       if (reduceMotion || layoutChanged) {
@@ -173,7 +192,7 @@ function CardFlipTransition({
     });
 
     return () => cancelAnimationFrame(frame);
-  }, [layoutVersion, onPresenceChange, requestedPanel, reduceMotion, startTransition]);
+  }, [instant, layoutVersion, onPresenceChange, requestedPanel, reduceMotion, startTransition]);
 
   useEffect(() => {
     return () => {
@@ -266,7 +285,7 @@ function CardFlipTransition({
     >
       <Box
         aria-hidden={isAnimating}
-        onTransitionEnd={handleTransitionEnd}
+        onTransitionEnd={instant ? undefined : handleTransitionEnd}
         sx={{
           minWidth: 0,
           transform: `translateX(${slideOffset}) rotateY(${rotation}deg)`,
@@ -277,12 +296,12 @@ function CardFlipTransition({
           pointerEvents: isAnimating ? "none" : "auto",
           transition: transitionEnabled
             ? transitionKind === "flip"
-              ? `transform ${compact ? 180 : HALF_FLIP_DURATION}ms ease-in-out, opacity ${compact ? 180 : HALF_FLIP_DURATION}ms ease-in-out`
-              : `transform ${compact ? 400 : SLIDE_DURATION}ms ${
+              ? `transform ${HALF_FLIP_DURATION}ms ease-in-out, opacity ${HALF_FLIP_DURATION}ms ease-in-out`
+              : `transform ${SLIDE_DURATION}ms ${
                   transitionKind === "slide-enter"
                     ? SLIDE_ENTER_EASING
                     : SLIDE_EXIT_EASING
-                }, opacity ${compact ? 400 : SLIDE_DURATION}ms ease`
+                }, opacity ${SLIDE_DURATION}ms ease`
             : "none",
           willChange: transitionEnabled ? "transform, opacity" : "auto",
         }}

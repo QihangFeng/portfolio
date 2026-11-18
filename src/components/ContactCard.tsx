@@ -14,7 +14,7 @@ import LiquidGlassCard from "./LiquidGlassCard";
 import { useContent } from "../content/useContent";
 import { PORTRAIT_LAYOUT } from "../theme/portrait";
 
-function ContactCard() {
+function ContactCard({ disableRipple }: { disableRipple?: boolean }) {
   const { profile, uiText } = useContent();
   const formRef = useRef<HTMLFormElement | null>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
@@ -80,6 +80,7 @@ function ContactCard() {
           {contactLinks.map((item) => (
             <Button
               key={item.label}
+              disableRipple={disableRipple}
               href={item.href}
               startIcon={item.icon}
               sx={{
@@ -100,9 +101,7 @@ function ContactCard() {
                 [PORTRAIT_LAYOUT]: {
                   minHeight: 60,
                   minWidth: 0,
-                  "@media (hover: none)": {
-                    "&:hover": { transform: "none", boxShadow: "none" },
-                  },
+                  "&:hover": { transform: "none", boxShadow: "none" },
                 },
               }}
             >
@@ -197,6 +196,7 @@ function ContactCard() {
             >
               <Button
                 type="submit"
+                disableRipple={disableRipple}
                 variant="contained"
                 disabled={isSubmitting}
                 sx={{

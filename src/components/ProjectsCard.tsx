@@ -29,7 +29,7 @@ const projectIcons = {
   balancedTrees: <AccountTreeIcon />,
 } satisfies Record<ProjectId, ReactNode>;
 
-function ProjectsCard() {
+function ProjectsCard({ disableRipple }: { disableRipple?: boolean }) {
   const { profile, uiText } = useContent();
   return (
     <LiquidGlassCard
@@ -82,9 +82,7 @@ function ProjectsCard() {
                 [PORTRAIT_LAYOUT]: {
                   p: 2,
                   minWidth: 0,
-                  "@media (hover: none)": {
-                    "&:hover": { transform: "none", boxShadow: "none" },
-                  },
+                  "&:hover": { transform: "none", boxShadow: "none" },
                 },
               }}
             >
@@ -165,6 +163,7 @@ function ProjectsCard() {
                 </Stack>
 
                 <Button
+                  disableRipple={disableRipple}
                   href={project.link}
                   target="_blank"
                   rel="noopener noreferrer"

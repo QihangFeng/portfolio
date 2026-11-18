@@ -17,7 +17,7 @@ function App() {
 
   function navigateToPanel(update: SetStateAction<PanelId>) {
     const panel = typeof update === "function" ? update(activePanel) : update;
-    if (isPortrait && panel !== activePanel && panel !== "home") {
+    if (isPortrait && panel !== activePanel) {
       window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     }
     setActivePanel(panel);
